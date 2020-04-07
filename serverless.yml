@@ -1,0 +1,51 @@
+service: gameattendants
+# app and org for use with dashboard.serverless.com
+app: game-attendants
+org: wvandolah
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+
+custom:
+  tables:
+    gameAttendants: game-attendants
+  dynamodb:
+    stages:
+      - ${self:provider.stage}
+    start:
+      inMemory: true
+      migrate: true
+      stage: ${opt:stage, 'dev'}
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+
+functions:
+  hello:
+    handler: src/controller/sendStatus.controller.sendStatusRequest
+    environment:
+      tableGameAttendants: ${self:custom.tables.gameAttendants}
+    events:
+      - http:
+          path: sendStatusRequest
+          method: post
+          cors: true
+
+resources:
+  Resources:
+    gameAttendants:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tables.gameAttendants}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
