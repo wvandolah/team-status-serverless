@@ -30,15 +30,28 @@ module.exports = {
   // });
   searchStatusRecord: (searchParams) => {
     const { team, id } = searchParams;
-    const keyString = team && id ? `team = :team and id = :id` : `team = :team`;
+    let keyString = '';
+    let expressionAttObj = {};
+    if (team && id) {
+      keyString = `team = :team and id = :id`;
+      expressionAttObj = {
+        ':team': team,
+        ':id': id,
+      };
+    } else if (team && !id) {
+      keyString = 'team = :team';
+      expressionAttObj = {
+        ':team': team,
+      };
+    } else {
+      throw new Error('Team information not provided');
+    }
     const params = {
       TableName: process.env.tableGameAttendants,
-      KeyConditionExpression: `team = :${team} and id = :id`,
-      ExpressionAttributeNames: {
-        ':number': '8179398675',
-      },
+      KeyConditionExpression: keyString,
+      ExpressionAttributeValues: expressionAttObj,
     };
-
+    console.log(params);
     var results = dynamodb.query(params).promise();
     results.then((e) => console.log(e));
   },
