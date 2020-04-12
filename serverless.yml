@@ -43,13 +43,22 @@ functions:
           method: post
           cors: true
   searchStatusRequest:
-    handler: src/controller/searchStatus.controller.searchStatus
+    handler: src/controller/status.controller.searchStatus
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
     events:
       - http:
-          path: searchStatus
+          path: status
           method: post
+          cors: true
+  deleteStatusRequest:
+    handler: src/controller/status.controller.deleteStatus
+    environment:
+      tableGameAttendants: ${self:custom.tables.gameAttendants}
+    events:
+      - http:
+          path: status
+          method: delete
           cors: true
 resources:
   Resources:
@@ -61,12 +70,12 @@ resources:
         AttributeDefinitions:
           - AttributeName: team
             AttributeType: S
-          - AttributeName: id
+          - AttributeName: game
             AttributeType: S
         KeySchema:
           - AttributeName: team
             KeyType: HASH
-          - AttributeName: id
+          - AttributeName: game
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1

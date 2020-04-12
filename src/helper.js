@@ -1,6 +1,13 @@
 'use strict';
 const uuid = require('uuid');
 module.exports = {
+  parseEvent: (event) => {
+    return {
+      data: JSON.parse(event.body),
+      response: {},
+      statusCode: '',
+    };
+  },
   checkNumbers: (players) => {
     const invalidNumbers = [];
     const validNumbers = [];

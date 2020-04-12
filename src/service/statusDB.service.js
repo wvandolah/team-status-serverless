@@ -6,10 +6,7 @@ module.exports = {
   createStatusRecord: (record) => {
     const params = {
       TableName: process.env.tableGameAttendants,
-      Item: {
-        ...record,
-        status: null,
-      },
+      Item: record,
     };
     return dynamodb.put(params).promise();
   },
@@ -29,16 +26,16 @@ module.exports = {
   //     else ppJson(data); // successful response
   // });
   searchStatusRecord: (searchParams) => {
-    const { team, id } = searchParams;
+    const { team, game } = searchParams;
     let keyString = '';
     let expressionAttObj = {};
-    if (team && id) {
-      keyString = `team = :team and id = :id`;
+    if (team && game) {
+      keyString = `team = :team and game = :game`;
       expressionAttObj = {
         ':team': team,
-        ':id': id,
+        ':game': game,
       };
-    } else if (team && !id) {
+    } else if (team && !game) {
       keyString = 'team = :team';
       expressionAttObj = {
         ':team': team,
@@ -51,8 +48,19 @@ module.exports = {
       KeyConditionExpression: keyString,
       ExpressionAttributeValues: expressionAttObj,
     };
-    console.log(params);
-    var results = dynamodb.query(params).promise();
-    results.then((e) => console.log(e));
+    return dynamodb.query(params).promise();
+  },
+
+  deleteStatusRecord: (deleteParams) => {
+    const { team, game } = deleteParams;
+    const key = {
+      team: team,
+      game: game,
+    };
+    const params = {
+      TableName: process.env.tableGameAttendants,
+      Key: key,
+    };
+    return dynamodb.delete(params).promise();
   },
 };
