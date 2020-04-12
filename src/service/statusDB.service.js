@@ -60,7 +60,31 @@ module.exports = {
     const params = {
       TableName: process.env.tableGameAttendants,
       Key: key,
+      ReturnValues: 'ALL_OLD',
     };
     return dynamodb.delete(params).promise();
+  },
+
+  updatePlayerStatusRecord: (updateParams) => {
+    const { team, game, playerNumber, status } = updateParams;
+    const key = {
+      team: team,
+      game: game,
+    };
+    const expressionAttNames = {
+      '#pl': 'players',
+      '#plToUpdate': playerNumber,
+      '#st': 'status',
+    };
+
+    const params = {
+      TableName: process.env.tableGameAttendants,
+      Key: key,
+      UpdateExpression: 'SET #pl.#plToUpdate.#st = :stUpdate',
+      ExpressionAttributeNames: expressionAttNames,
+      ExpressionAttributeValues: { ':stUpdate': status },
+      ReturnValues: 'ALL_NEW',
+    };
+    return dynamodb.update(params).promise();
   },
 };

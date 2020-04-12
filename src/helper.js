@@ -1,5 +1,4 @@
 'use strict';
-const uuid = require('uuid');
 module.exports = {
   parseEvent: (event) => {
     return {
@@ -16,7 +15,7 @@ module.exports = {
       if (onlyNumber.length !== 10) {
         invalidNumbers.push(player);
       } else {
-        validNumbers.push({ name: player.name, number: onlyNumber, id: uuid.v4() });
+        validNumbers.push({ name: player.name, number: onlyNumber });
       }
     });
     return { invalidNumbers, validNumbers };

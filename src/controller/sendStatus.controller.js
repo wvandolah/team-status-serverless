@@ -9,7 +9,7 @@ module.exports.sendStatusRequest = async (event) => {
   try {
     if (data.players && data.players.length > 0 && 'team' in data && 'game' in data) {
       const { invalidNumbers, validNumbers } = checkNumbers(data.players);
-      const promiseResult = await Promise.all(validNumbers.map((player) => sendSMS(player)));
+      const promiseResult = await Promise.all(validNumbers.map((player) => sendSMS(player, data.team, data.game)));
 
       // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
       // Returned values will be in order of the Promises passed, regardless of completion order.

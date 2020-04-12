@@ -60,6 +60,15 @@ functions:
           path: status
           method: delete
           cors: true
+  updatePlayerStatusRequest:
+    handler: src/controller/status.controller.updatePlayerStatus
+    environment:
+      tableGameAttendants: ${self:custom.tables.gameAttendants}
+    events:
+      - http:
+          path: playerStatus
+          method: put
+          cors: true
 resources:
   Resources:
     gameAttendants:
