@@ -9,7 +9,8 @@ plugins:
 
 custom:
   tables:
-    gameAttendants: game-attendants
+    gameAttendants: game-attendants1
+    teamPlayers: team-players
   dynamodb:
     stages:
       - ${self:provider.stage}
@@ -69,6 +70,33 @@ functions:
           path: playerStatus
           method: put
           cors: true
+  createTeamPlayerRequest:
+    handler: src/controller/teamPlayers.controller.create
+    environment:
+      tableTeamPlayers: ${self:custom.tables.teamPlayers}
+    events:
+      - http:
+          path: teamPlayers
+          method: post
+          cors: true
+  searchTeamPlayerRequest:
+    handler: src/controller/teamPlayers.controller.search
+    environment:
+      tableTeamPlayers: ${self:custom.tables.teamPlayers}
+    events:
+      - http:
+          path: teamPlayers
+          method: get
+          cors: true
+  deleteTeamPlayerRequest:
+    handler: src/controller/teamPlayers.controller.delete
+    environment:
+      tableTeamPlayers: ${self:custom.tables.teamPlayers}
+    events:
+      - http:
+          path: teamPlayers
+          method: delete
+          cors: true
 resources:
   Resources:
     gameAttendants:
@@ -86,7 +114,19 @@ resources:
             KeyType: HASH
           - AttributeName: game
             KeyType: RANGE
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+    teamPlayers:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tables.teamPlayers}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: teamId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: teamId
+            KeyType: RANGE
 
