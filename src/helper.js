@@ -4,6 +4,7 @@ module.exports = {
     return {
       data: JSON.parse(event.body),
       response: {},
+      queryParams: event.queryStringParameters,
       statusCode: '',
     };
   },
