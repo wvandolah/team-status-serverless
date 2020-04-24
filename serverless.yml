@@ -11,6 +11,10 @@ custom:
   tables:
     gameAttendants: game-attendants1
     teamPlayers: team-players
+  Auth0:
+    issuer: https://wvandolah.auth0.com/
+    jwksUri: https://wvandolah.auth0.com/.well-known/jwks.json
+    audience: gameattendants
   dynamodb:
     stages:
       - ${self:provider.stage}
@@ -34,6 +38,12 @@ provider:
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.tables.gameAttendants}"
 
 functions:
+  authFn:
+    handler: src/service/authFn.service.authFn
+    environment:
+      jwksUri: ${self:custom.Auth0.jwksUri}
+      audience: ${self:custom.Auth0.audience}
+      issuer: ${self:custom.Auth0.issuer}
   sendStatusRequest:
     handler: src/controller/sendStatus.controller.sendStatusRequest
     environment:
@@ -43,6 +53,7 @@ functions:
           path: sendStatusRequest
           method: post
           cors: true
+          authorizer: authFn
   searchStatusRequest:
     handler: src/controller/status.controller.searchStatus
     environment:
@@ -61,6 +72,7 @@ functions:
           path: status
           method: delete
           cors: true
+          authorizer: authFn
   updatePlayerStatusRequest:
     handler: src/controller/status.controller.updatePlayerStatus
     environment:
@@ -79,6 +91,7 @@ functions:
           path: teamPlayers
           method: post
           cors: true
+          authorizer: authFn
   searchTeamPlayerRequest:
     handler: src/controller/teamPlayers.controller.search
     environment:
@@ -88,6 +101,7 @@ functions:
           path: teamPlayers
           method: get
           cors: true
+          authorizer: authFn
   deleteTeamPlayerRequest:
     handler: src/controller/teamPlayers.controller.delete
     environment:
@@ -97,6 +111,7 @@ functions:
           path: teamPlayers
           method: delete
           cors: true
+          authorizer: authFn
 resources:
   Resources:
     gameAttendants:

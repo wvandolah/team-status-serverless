@@ -40,7 +40,6 @@ module.exports.sendStatusRequest = async (event) => {
         players: {},
       };
       validNumbers.forEach((player, i) => {
-        console.log(player);
         result.players[player.number] = { ...player, snsMessageId: promiseResult[i].MessageId, status: null };
       });
       await createStatusRecord(result);
