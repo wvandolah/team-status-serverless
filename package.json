@@ -19,6 +19,8 @@
     "serverless-offline": "^5.12.1"
   },
   "dependencies": {
+    "jsonwebtoken": "^8.5.1",
+    "jwks-rsa": "^1.8.0",
     "uuid": "^7.0.3"
   }
 }

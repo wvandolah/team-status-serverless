@@ -1,6 +1,6 @@
 service: gameattendants
 # app and org for use with dashboard.serverless.com
-app: game-attendants
+app: game-attendant
 org: wvandolah
 
 plugins:
@@ -36,6 +36,15 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.tables.gameAttendants}"
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.tables.teamPlayers}"
 
 functions:
   authFn:
