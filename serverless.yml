@@ -11,7 +11,7 @@ custom:
   serverless-offline:
     port: 4000
   tables:
-    gameAttendants: game-attendant
+    gameAttendants: game-attendants
     teamPlayers: team-player
   Auth0:
     issuer: https://wvandolah.auth0.com/
