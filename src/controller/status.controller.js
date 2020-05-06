@@ -4,10 +4,10 @@ const { searchStatusRecord, deleteStatusRecord, updatePlayerStatusRecord } = req
 const { setResponse, parseEvent } = require('../helper');
 
 module.exports.searchStatus = async (event) => {
-  let { data, response, statusCode } = parseEvent(event);
+  let { queryParams, response, statusCode } = parseEvent(event);
   try {
     statusCode = 200;
-    response = await searchStatusRecord(data);
+    response = await searchStatusRecord(queryParams);
   } catch (err) {
     console.error(err);
     statusCode = 500;
@@ -16,7 +16,7 @@ module.exports.searchStatus = async (event) => {
     };
   }
 
-  return setResponse(statusCode, response, data);
+  return setResponse(statusCode, response, queryParams);
 };
 
 module.exports.deleteStatus = async (event) => {
@@ -44,7 +44,7 @@ module.exports.deleteStatus = async (event) => {
 module.exports.updatePlayerStatus = async (event) => {
   let { data, response, statusCode } = parseEvent(event);
   try {
-    if ('team' in data && 'game' in data && 'playerNumber' in data && 'status' in data) {
+    if ('teamId' in data && 'gameId' in data && 'playerId' in data && 'status' in data) {
       statusCode = 201;
       response = await updatePlayerStatusRecord(data);
     } else {

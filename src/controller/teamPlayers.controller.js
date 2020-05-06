@@ -28,6 +28,7 @@ module.exports.create = async (event) => {
         userId: data.userId,
         teamId: data.teamId,
         players: data.players,
+        teamName: data.teamName,
       };
       statusCode = 201;
       await createTeamPlayerRecord(record);
@@ -51,7 +52,7 @@ module.exports.create = async (event) => {
 module.exports.search = async (event) => {
   let { queryParams, response, statusCode } = parseEvent(event);
   try {
-    if ('userId' in queryParams) {
+    if (queryParams && 'userId' in queryParams) {
       statusCode = 200;
       response = await searchTeamPlayerRecord(queryParams);
     } else {

@@ -4,9 +4,9 @@ const AWS = require('aws-sdk');
 const SNS = new AWS.SNS({ apiVersion: '2010-03-31', SMS: { smsType: 'Transactional' } });
 
 module.exports = {
-  sendSMS: (player, data) => {
+  sendSMS: (player, data, gameId) => {
     const smsData = {
-      Message: `Confirm your status for ${data.teamName} game at ${data.dateTime}: somebaseUrl/statusUpdate?teamId=${data.team}&gameId=${data.game}&playerNumber=${player.number}`,
+      Message: `Confirm your status for ${data.teamName} game at ${data.dateTime}: http://localhost:3000/statusUpdate?teamId=${data.teamId}&gameId=${gameId}&playerId=${player.id}`,
       PhoneNumber: `+1${player.number}`,
     };
     // Sending sms costs $0.0065/msg

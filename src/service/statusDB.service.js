@@ -26,19 +26,19 @@ module.exports = {
   //     else ppJson(data); // successful response
   // });
   searchStatusRecord: (searchParams) => {
-    const { team, game } = searchParams;
+    const { teamId, gameId } = searchParams;
     let keyString = '';
     let expressionAttObj = {};
-    if (team && game) {
-      keyString = `team = :team and game = :game`;
+    if (teamId && gameId) {
+      keyString = `teamId = :teamId and gameId = :gameId`;
       expressionAttObj = {
-        ':team': team,
-        ':game': game,
+        ':teamId': teamId,
+        ':gameId': gameId,
       };
-    } else if (team && !game) {
-      keyString = 'team = :team';
+    } else if (teamId && !gameId) {
+      keyString = 'teamId = :teamId';
       expressionAttObj = {
-        ':team': team,
+        ':teamId': teamId,
       };
     } else {
       throw new Error('Team information not provided');
@@ -66,14 +66,14 @@ module.exports = {
   },
 
   updatePlayerStatusRecord: (updateParams) => {
-    const { team, game, playerNumber, status } = updateParams;
+    const { teamId, gameId, playerId, status } = updateParams;
     const key = {
-      team: team,
-      game: game,
+      teamId: teamId,
+      gameId: gameId,
     };
     const expressionAttNames = {
       '#pl': 'players',
-      '#plToUpdate': playerNumber,
+      '#plToUpdate': playerId,
       '#st': 'status',
     };
 

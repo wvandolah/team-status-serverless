@@ -1,4 +1,4 @@
-service: gameattendants
+service: gameattendant
 # app and org for use with dashboard.serverless.com
 app: game-attendant
 org: wvandolah
@@ -8,9 +8,11 @@ plugins:
   - serverless-offline
 
 custom:
+  serverless-offline:
+    port: 4000
   tables:
-    gameAttendants: game-attendants1
-    teamPlayers: team-players
+    gameAttendants: game-attendant
+    teamPlayers: team-player
   Auth0:
     issuer: https://wvandolah.auth0.com/
     jwksUri: https://wvandolah.auth0.com/.well-known/jwks.json
@@ -59,7 +61,7 @@ functions:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
     events:
       - http:
-          path: sendStatusRequest
+          path: status
           method: post
           cors: true
           authorizer: authFn
@@ -70,7 +72,7 @@ functions:
     events:
       - http:
           path: status
-          method: post
+          method: get
           cors: true
   deleteStatusRequest:
     handler: src/controller/status.controller.deleteStatus
@@ -129,14 +131,14 @@ resources:
         TableName: ${self:custom.tables.gameAttendants}
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
-          - AttributeName: team
+          - AttributeName: teamId
             AttributeType: S
-          - AttributeName: game
+          - AttributeName: gameId
             AttributeType: S
         KeySchema:
-          - AttributeName: team
+          - AttributeName: teamId
             KeyType: HASH
-          - AttributeName: game
+          - AttributeName: gameId
             KeyType: RANGE
     teamPlayers:
       Type: AWS::DynamoDB::Table

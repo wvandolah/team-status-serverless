@@ -12,11 +12,11 @@ module.exports = {
     const invalidNumbers = [];
     const validNumbers = [];
     players.forEach((player) => {
-      const onlyNumber = player.number.replace(/\D/g, '');
+      const onlyNumber = player.phoneNumber.replace(/\D/g, '');
       if (onlyNumber.length !== 10) {
         invalidNumbers.push(player);
       } else {
-        validNumbers.push({ name: player.name, number: onlyNumber });
+        validNumbers.push({ id: player.id, phoneNumber: onlyNumber, ...player });
       }
     });
     return { invalidNumbers, validNumbers };

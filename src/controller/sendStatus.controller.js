@@ -3,6 +3,7 @@
 const { checkNumbers, setResponse, parseEvent } = require('../helper');
 const { sendSMS } = require('../service/sendStatus.service');
 const { createStatusRecord } = require('../service/statusDB.service');
+const { v4: uuid } = require('uuid');
 
 /**
  * example request
@@ -26,21 +27,22 @@ const { createStatusRecord } = require('../service/statusDB.service');
 module.exports.sendStatusRequest = async (event) => {
   let { data, response, statusCode } = parseEvent(event);
   try {
-    if (data.players && data.players.length > 0 && 'team' in data && 'game' in data && 'dateTime' in data) {
+    if (data.players && data.players.length > 0 && 'teamId' in data && 'dateTime' in data) {
+      const gameId = uuid();
       const { invalidNumbers, validNumbers } = checkNumbers(data.players);
-      const promiseResult = await Promise.all(validNumbers.map((player) => sendSMS(player, data)));
+      const promiseResult = await Promise.all(validNumbers.map((player) => sendSMS(player, data, gameId)));
 
       // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
       // Returned values will be in order of the Promises passed, regardless of completion order.
       const result = {
-        team: data.team,
-        game: data.game,
+        teamId: data.teamId,
+        gameId: gameId,
         teamName: data.teamName,
         dateTime: data.dateTime,
         players: {},
       };
       validNumbers.forEach((player, i) => {
-        result.players[player.number] = { ...player, snsMessageId: promiseResult[i].MessageId, status: null };
+        result.players[player.id] = { ...player, snsMessageId: promiseResult[i].MessageId, status: null };
       });
       await createStatusRecord(result);
       statusCode = 201;
