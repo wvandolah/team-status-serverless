@@ -3,7 +3,7 @@
 const { checkNumbers, setResponse, parseEvent } = require('../helper');
 const { sendSMS } = require('../service/sendStatus.service');
 const { createStatusRecord } = require('../service/statusDB.service');
-const { v4: uuid } = require('uuid');
+const shortid = require('shortid');
 
 /**
  * example request
@@ -28,7 +28,7 @@ module.exports.sendStatusRequest = async (event) => {
   let { data, response, statusCode } = parseEvent(event);
   try {
     if (data.players && data.players.length > 0 && 'teamId' in data && 'dateTime' in data) {
-      const gameId = uuid();
+      const gameId = shortid.generate();
       const { invalidNumbers, validNumbers } = checkNumbers(data.players);
       const promiseResult = await Promise.all(validNumbers.map((player) => sendSMS(player, data, gameId)));
 
