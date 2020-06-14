@@ -26,11 +26,14 @@ module.exports.deleteStatus = async (event) => {
     if ('teamId' in data && 'gameId' in data) {
       statusCode = 200;
       response = await deleteStatusRecord(data);
-      await Promise.all(
-        Object.values(response.Attributes.players).map((player) => {
-          return sendDeleteSMS(player, response.Attributes);
-        }),
-      );
+      const gameTime = new Date(response.Attributes.dateTime);
+      if (new Date() < gameTime) {
+        await Promise.all(
+          Object.values(response.Attributes.players).map((player) => {
+            return sendDeleteSMS(player, response.Attributes);
+          }),
+        );
+      }
     } else {
       response = {
         error: 'Team and Game information not provided',
