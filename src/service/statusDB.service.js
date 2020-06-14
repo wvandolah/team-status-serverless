@@ -52,10 +52,10 @@ module.exports = {
   },
 
   deleteStatusRecord: (deleteParams) => {
-    const { team, game } = deleteParams;
+    const { teamId, gameId } = deleteParams;
     const key = {
-      team: team,
-      game: game,
+      teamId: teamId,
+      gameId: gameId,
     };
     const params = {
       TableName: process.env.tableGameAttendants,

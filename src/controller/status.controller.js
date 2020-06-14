@@ -2,6 +2,7 @@
 
 const { searchStatusRecord, deleteStatusRecord, updatePlayerStatusRecord } = require('../service/statusDB.service');
 const { setResponse, parseEvent } = require('../helper');
+const { sendDeleteSMS } = require('../service/sendStatus.service');
 
 module.exports.searchStatus = async (event) => {
   let { queryParams, response, statusCode } = parseEvent(event);
@@ -22,9 +23,14 @@ module.exports.searchStatus = async (event) => {
 module.exports.deleteStatus = async (event) => {
   let { data, response, statusCode } = parseEvent(event);
   try {
-    if ('team' in data && 'game' in data) {
+    if ('teamId' in data && 'gameId' in data) {
       statusCode = 200;
       response = await deleteStatusRecord(data);
+      await Promise.all(
+        Object.values(response.Attributes.players).map((player) => {
+          return sendDeleteSMS(player, response.Attributes);
+        }),
+      );
     } else {
       response = {
         error: 'Team and Game information not provided',

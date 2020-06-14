@@ -1,7 +1,7 @@
 'use strict';
 
 const { checkNumbers, setResponse, parseEvent } = require('../helper');
-const { sendSMS } = require('../service/sendStatus.service');
+const { sendStatusSMS } = require('../service/sendStatus.service');
 const { createStatusRecord } = require('../service/statusDB.service');
 const shortid = require('shortid');
 
@@ -30,13 +30,14 @@ module.exports.sendStatusRequest = async (event) => {
     if (data.players && data.players.length > 0 && 'teamId' in data && 'dateTime' in data) {
       const gameId = shortid.generate();
       const { invalidNumbers, validNumbers } = checkNumbers(data.players);
-      const promiseResult = await Promise.all(validNumbers.map((player) => sendSMS(player, data, gameId)));
+      const promiseResult = await Promise.all(validNumbers.map((player) => sendStatusSMS(player, data, gameId)));
 
       // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
       // Returned values will be in order of the Promises passed, regardless of completion order.
       const result = {
         teamId: data.teamId,
         gameId: gameId,
+        opponentName: data.opponentName,
         teamName: data.teamName,
         dateTime: data.dateTime,
         players: {},
