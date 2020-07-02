@@ -2,7 +2,7 @@
 
 const { searchStatusRecord, deleteStatusRecord, updatePlayerStatusRecord } = require('../service/statusDB.service');
 const { setResponse, parseEvent } = require('../helper');
-const { sendDeleteSMS } = require('../service/sendStatus.service');
+const { sendDeleteSMS, sendDeleteEmail } = require('../service/sendStatus.service');
 
 module.exports.searchStatus = async (event) => {
   let { response, statusCode } = parseEvent(event);
@@ -71,12 +71,25 @@ module.exports.deleteStatus = async (event) => {
       statusCode = 200;
       response = await deleteStatusRecord(data);
       const gameTime = new Date(response.Attributes.dateTime);
+      const toSendSms = [];
+      const toSendEmail = [];
+      Object.values(response.Attributes.players).forEach((player) => {
+        if (player.sendEmail) {
+          toSendEmail.push(player);
+        }
+        if (player.sendText) {
+          toSendSms.push(player);
+        }
+      });
+
       if (new Date() < gameTime) {
         await Promise.all(
-          Object.values(response.Attributes.players).map((player) => {
+          toSendSms.map((player) => {
             return sendDeleteSMS(player, response.Attributes);
           }),
         );
+        const sesReturn = await sendDeleteEmail(toSendEmail, response.Attributes);
+        console.log('here', sesReturn);
       }
     } else {
       response = {

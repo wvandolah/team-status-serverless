@@ -35,6 +35,33 @@ module.exports = {
     return sendSMS(message, player.phoneNumber);
   },
 
+  sendDeleteEmail: (players, data) => {
+    const params = {
+      Destinations: [],
+      Source: 'Team Status <doNotReply@wvandolah.com>',
+      ConfigurationSetName: 'failedEmail',
+      Template: 'gameDeleteNotificationEmail',
+      DefaultTemplateData:
+        '{ "teamName":"<null>", "opponentName": "<null>",  "dateTime": "<null>", "firstName":"<null>" }',
+    };
+    const sentEmails = [];
+    players.forEach((player) => {
+      if (player.sendEmail) {
+        const playerParams = {
+          Destination: {
+            ToAddresses: [player.email],
+          },
+          ReplacementTemplateData: `{ "teamName":"${data.teamName}", "opponentName":"${data.opponentName}",  "dateTime": "${data.dateTime}", "firstName":"${player.firstName}"}`,
+        };
+        params.Destinations.push(playerParams);
+        sentEmails.push(player);
+      }
+    });
+    const sesReturn = params.Destinations.length > 0 ? ses.sendBulkTemplatedEmail(params).promise() : {};
+    // const sesReturn = {};
+    return sesReturn;
+  },
+
   sendStatusEmail: (players, data, gameId) => {
     // https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/ses-examples-sending-email.html
     // template currently is gameNotificationEmail
@@ -66,7 +93,7 @@ module.exports = {
     });
 
     const sesReturn = params.Destinations.length > 0 ? ses.sendBulkTemplatedEmail(params).promise() : {};
-
+    // const sesReturn = {};
     return { sesReturn, sentEmails };
   },
 };
