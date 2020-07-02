@@ -39,7 +39,7 @@ module.exports = {
     const params = {
       Destinations: [],
       Source: 'Team Status <doNotReply@wvandolah.com>',
-      ConfigurationSetName: 'failedEmail',
+      // ConfigurationSetName: 'failedEmail',
       Template: 'gameDeleteNotificationEmail',
       DefaultTemplateData:
         '{ "teamName":"<null>", "opponentName": "<null>",  "dateTime": "<null>", "firstName":"<null>" }',
