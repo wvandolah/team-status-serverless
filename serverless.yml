@@ -65,8 +65,18 @@ functions:
           method: post
           cors: true
           authorizer: authFn
+  resendStatusRequest:
+    handler: src/controller/sendStatus.controller.resendStatusRequest
+    environment:
+      tableGameAttendants: ${self:custom.tables.gameAttendants}
+    events:
+      - http:
+          path: resend
+          method: post
+          cors: true
+          authorizer: authFn
   searchStatusRequest:
-    handler: src/controller/status.controller.searchStatus
+    handler: src/controller/status.controller.searchStatuses
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
     events:
@@ -74,6 +84,7 @@ functions:
           path: status
           method: get
           cors: true
+          authorizer: authFn
   deleteStatusRequest:
     handler: src/controller/status.controller.deleteStatus
     environment:
@@ -92,6 +103,15 @@ functions:
       - http:
           path: playerStatus
           method: put
+          cors: true
+  searchPlayerStatusRequest:
+    handler: src/controller/status.controller.searchStatus
+    environment:
+      tableGameAttendants: ${self:custom.tables.gameAttendants}
+    events:
+      - http:
+          path: playerStatus
+          method: get
           cors: true
   createTeamPlayerRequest:
     handler: src/controller/teamPlayers.controller.create

@@ -66,15 +66,17 @@ module.exports = {
   },
 
   updatePlayerStatusRecord: (updateParams) => {
-    const { teamId, gameId, playerId, status } = updateParams;
+    const { teamId, gameId, playerId, status, snsMessageId } = updateParams;
     const key = {
       teamId: teamId,
       gameId: gameId,
     };
+    const attributeToUpdate = status ? 'status' : 'snsMessageId';
+    const attributeValueToUpdate = status ? status : snsMessageId;
     const expressionAttNames = {
       '#pl': 'players',
       '#plToUpdate': playerId,
-      '#st': 'status',
+      '#st': attributeToUpdate,
     };
 
     const params = {
@@ -82,7 +84,7 @@ module.exports = {
       Key: key,
       UpdateExpression: 'SET #pl.#plToUpdate.#st = :stUpdate',
       ExpressionAttributeNames: expressionAttNames,
-      ExpressionAttributeValues: { ':stUpdate': status },
+      ExpressionAttributeValues: { ':stUpdate': attributeValueToUpdate },
       ReturnValues: 'ALL_NEW',
     };
     return dynamodb.update(params).promise();
