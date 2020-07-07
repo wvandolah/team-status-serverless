@@ -36,4 +36,20 @@ module.exports = {
       }),
     };
   },
+  sumAttendance: (players) => {
+    return players.reduce(
+      (sums, player) => {
+        if (player.status === 'In') {
+          sums.in++;
+        } else if (player.status === 'Out') {
+          sums.out++;
+        } else {
+          sums.noResponse++;
+        }
+
+        return sums;
+      },
+      { in: 0, out: 0, noResponse: 0 },
+    );
+  },
 };

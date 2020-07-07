@@ -1,7 +1,7 @@
 'use strict';
 
 const { searchStatusRecord, deleteStatusRecord, updatePlayerStatusRecord } = require('../service/statusDB.service');
-const { setResponse, parseEvent } = require('../helper');
+const { setResponse, parseEvent, sumAttendance } = require('../helper');
 const { sendDeleteSMS, sendDeleteEmail } = require('../service/sendStatus.service');
 
 module.exports.searchStatus = async (event) => {
@@ -33,9 +33,15 @@ module.exports.searchStatus = async (event) => {
     }
     statusCode = 200;
     response = await searchStatusRecord(queryParams);
-    response.Items[0].players = {
-      [queryParams.playerId]: { ...response.Items[0].players[queryParams.playerId] },
-    };
+    if (response.Count > 0 && response.Items[0].players[queryParams.playerId]) {
+      const attendance = sumAttendance(Object.values(response.Items[0].players));
+      response.Items[0]['attendance'] = attendance;
+      response.Items[0].players = {
+        [queryParams.playerId]: { ...response.Items[0].players[queryParams.playerId] },
+      };
+    } else {
+      response = {};
+    }
   } catch (err) {
     console.error(err);
     statusCode = 500;
@@ -53,6 +59,9 @@ module.exports.searchStatuses = async (event) => {
   try {
     statusCode = 200;
     response = await searchStatusRecord(queryParams);
+    if (response.Count > 0) {
+      response.Items[0]['attendance'] = sumAttendance(Object.values(response.Items[0].players));
+    }
   } catch (err) {
     console.error(err);
     statusCode = 500;

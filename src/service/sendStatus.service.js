@@ -58,7 +58,6 @@ module.exports = {
       }
     });
     const sesReturn = params.Destinations.length > 0 ? ses.sendBulkTemplatedEmail(params).promise() : {};
-    // const sesReturn = {};
     return sesReturn;
   },
 
