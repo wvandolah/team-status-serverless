@@ -99,8 +99,10 @@ module.exports.updatePlayerStatus = async (event) => {
   try {
     if ('teamId' in data && 'gameId' in data && 'playerId' in data && 'status' in data) {
       statusCode = 201;
+      console.info('Player updated status with info: ', JSON.stringify(data));
       response = await updatePlayerStatusRecord(data);
     } else {
+      console.warn('failed to update status: ', JSON.stringify(data));
       response = {
         error: 'Team, Game, playerNumber and status information not provided',
       };
