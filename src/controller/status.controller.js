@@ -5,33 +5,11 @@ const { setResponse, parseEvent, sumAttendance } = require('../helper');
 const { sendDeleteSMS, sendDeleteEmail } = require('../service/sendStatus.service');
 
 module.exports.searchStatus = async (event) => {
-  let { response, statusCode } = parseEvent(event);
-  const queryParams = {};
-  const paramKey = {
-    t: 'teamId',
-    g: 'gameId',
-    p: 'playerId',
-  };
+  let { queryParams, response, statusCode } = parseEvent(event);
+
   try {
-    let validRequest = true;
-    event.headers.Referer.replace(/[^?]*./, '')
-      .split('&')
-      .forEach((p) => {
-        const [idType, idValue] = p.split('=');
-        const paramName = paramKey[idType];
-        queryParams[paramName] = idValue;
-        if (!paramName) {
-          validRequest = false;
-        }
-      });
-    if (!validRequest) {
-      response = {
-        error: 'Invalid Request',
-      };
-      statusCode = 400;
-      return setResponse(statusCode, response);
-    }
     statusCode = 200;
+    console.info('Searching player Status for: ', JSON.stringify(queryParams));
     response = await searchStatusRecord(queryParams);
     if (response.Count > 0 && response.Items[0].players[queryParams.playerId]) {
       const attendance = sumAttendance(Object.values(response.Items[0].players));
@@ -43,7 +21,7 @@ module.exports.searchStatus = async (event) => {
       response = {};
     }
   } catch (err) {
-    console.error(err);
+    console.warn(JSON.stringify(err));
     statusCode = 500;
     response = {
       error: err.message,
@@ -63,7 +41,7 @@ module.exports.searchStatuses = async (event) => {
       response.Items[0]['attendance'] = sumAttendance(Object.values(response.Items[0].players));
     }
   } catch (err) {
-    console.error(err);
+    console.warn(JSON.stringify(err));
     statusCode = 500;
     response = {
       error: err.message,
@@ -98,7 +76,7 @@ module.exports.deleteStatus = async (event) => {
           }),
         );
         const sesReturn = await sendDeleteEmail(toSendEmail, response.Attributes);
-        console.log('here', sesReturn);
+        console.warn('here', sesReturn);
       }
     } else {
       response = {
@@ -107,7 +85,7 @@ module.exports.deleteStatus = async (event) => {
       statusCode = 400;
     }
   } catch (err) {
-    console.error(err);
+    console.warn(JSON.stringify(err));
     statusCode = 500;
     response = {
       error: err.message,
@@ -129,7 +107,7 @@ module.exports.updatePlayerStatus = async (event) => {
       statusCode = 400;
     }
   } catch (err) {
-    console.error(err);
+    console.warn(JSON.stringify(err));
     statusCode = 500;
     response = {
       error: err.message,

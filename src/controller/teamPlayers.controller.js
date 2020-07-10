@@ -40,7 +40,7 @@ module.exports.create = async (event) => {
       statusCode = 400;
     }
   } catch (err) {
-    console.error(err);
+    console.warn(JSON.stringify(err));
     statusCode = 500;
     response = {
       error: err.message,
@@ -62,7 +62,7 @@ module.exports.search = async (event) => {
       };
     }
   } catch (err) {
-    console.error(err);
+    console.warn(JSON.stringify(err));
     statusCode = 500;
     response = {
       error: err.message,
@@ -84,7 +84,7 @@ module.exports.delete = async (event) => {
       };
     }
   } catch (err) {
-    console.error(err);
+    console.warn(JSON.stringify(err));
     statusCode = 500;
     response = {
       error: err.message,

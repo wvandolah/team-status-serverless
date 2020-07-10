@@ -49,7 +49,7 @@ module.exports.authFn = async (event) => {
       },
     };
   } catch (err) {
-    console.error(err);
+    console.warn(JSON.stringify(err));
     // Tells API Gateway to return a 401 Unauthorized response
     throw new Error('Unauthorized');
   }

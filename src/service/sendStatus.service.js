@@ -11,7 +11,7 @@ const sendSMS = (message, phoneNumber) => {
   };
   // Sending sms costs $0.0065/msg
   if (process.env.IS_OFFLINE) {
-    console.log(smsData);
+    console.warn(smsData);
     const mockResponse = {
       ResponseMetadata: {
         RequestId: message,

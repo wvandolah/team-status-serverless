@@ -63,7 +63,7 @@ module.exports.sendStatusRequest = async (event) => {
       };
     }
   } catch (err) {
-    console.error(err);
+    console.warn(JSON.stringify(err));
     statusCode = 500;
     response.error = err;
   }
@@ -110,7 +110,7 @@ module.exports.resendStatusRequest = async (event) => {
       };
     }
   } catch (err) {
-    console.error(err);
+    console.warn(JSON.stringify(err));
     statusCode = 500;
     response.error = err;
   }
