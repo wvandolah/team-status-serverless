@@ -11,7 +11,7 @@ module.exports = async () => {
   const getEnv = {};
   Object.keys(service.functions)
     .map((funcName) => service.functions[funcName])
-    .map((func) => {
+    .forEach((func) => {
       Object.keys(func.environment).forEach((funcEnv) => (getEnv[funcEnv] = func.environment[funcEnv]));
     });
 
