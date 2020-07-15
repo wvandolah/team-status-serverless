@@ -1,11 +1,11 @@
 'use strict';
 
-const AWS = require('aws-sdk');
+const { DocumentClient } = require('aws-sdk/clients/dynamodb');
 
 let options = { convertEmptyValues: true };
 
 // connect to local DB if running offline
-if (process.env.IS_OFFLINE) {
+if (process.env.IS_OFFLINE || process.env.NODE_ENV) {
   options = {
     ...options,
     region: 'localhost',
@@ -13,6 +13,6 @@ if (process.env.IS_OFFLINE) {
   };
 }
 
-const client = new AWS.DynamoDB.DocumentClient(options);
+const client = new DocumentClient(options);
 
 module.exports = client;

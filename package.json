@@ -6,14 +6,19 @@
   "author": "William VanDolah <william.vandolah@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "local": "serverless offline start --noAuth"
+    "local": "serverless offline start --noAuth",
+    "test": "jest"
   },
   "devDependencies": {
+    "@shelf/jest-dynamodb": "^1.7.0",
     "aws-sdk": "^2.653.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-jest": "^23.18.0",
     "eslint-plugin-prettier": "^3.1.2",
+    "jest": "^26.1.0",
     "prettier": "^2.0.4",
+    "serverless": "^1.74.1",
     "serverless-dynamodb-local": "^0.2.39",
     "serverless-offline": "^5.12.1"
   },

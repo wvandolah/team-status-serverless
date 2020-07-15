@@ -51,6 +51,7 @@ module.exports = {
     return dynamodb.query(params).promise();
   },
 
+  // TODO: needs to be tested
   deleteStatusRecord: (deleteParams) => {
     const { teamId, gameId } = deleteParams;
     const key = {
@@ -65,6 +66,7 @@ module.exports = {
     return dynamodb.delete(params).promise();
   },
 
+  // TODO: needs to be tested
   updatePlayerStatusRecord: (updateParams) => {
     const { teamId, gameId, playerId, status, snsMessageId } = updateParams;
     const key = {
