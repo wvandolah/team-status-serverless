@@ -3,7 +3,7 @@ const {
   searchStatusRecord,
   deleteStatusRecord,
   updatePlayerStatusRecord,
-} = require('../src/service/statusDB.service');
+} = require('../../src/service/statusDB.service');
 
 const testTeams = [
   {
