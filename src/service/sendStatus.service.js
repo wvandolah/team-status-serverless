@@ -44,7 +44,7 @@ module.exports = {
       DefaultTemplateData:
         '{ "teamName":"<null>", "opponentName": "<null>",  "dateTime": "<null>", "firstName":"<null>" }',
     };
-    const sentEmails = [];
+
     players.forEach((player) => {
       if (player.sendEmail) {
         const playerParams = {
@@ -54,11 +54,9 @@ module.exports = {
           ReplacementTemplateData: `{ "teamName":"${data.teamName}", "opponentName":"${data.opponentName}",  "dateTime": "${data.dateTime}", "firstName":"${player.firstName}"}`,
         };
         params.Destinations.push(playerParams);
-        sentEmails.push(player);
       }
     });
-    const sesReturn = params.Destinations.length > 0 ? ses.sendBulkTemplatedEmail(params).promise() : {};
-    return sesReturn;
+    return params.Destinations.length > 0 ? ses.sendBulkTemplatedEmail(params).promise() : {};
   },
 
   sendStatusEmail: (players, data, gameId) => {

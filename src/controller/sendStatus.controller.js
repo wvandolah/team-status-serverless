@@ -25,7 +25,9 @@ const shortid = require('shortid');
 }
  */
 module.exports.sendStatusRequest = async (event) => {
-  let { data, response, statusCode } = parseEvent(event);
+  const { data } = parseEvent(event);
+  let statusCode = 201;
+  let response = {};
   try {
     if (data.players && data.players.length > 0 && 'teamId' in data && 'dateTime' in data) {
       const gameId = shortid.generate();
@@ -54,7 +56,6 @@ module.exports.sendStatusRequest = async (event) => {
       // bulk ses returnes and array of statuses, but the order is not guaranteed.
       result['bulkEmailDestinationStatus'] = awaitedSes;
       await createStatusRecord(result);
-      statusCode = 201;
       response = { invalidNumbers, result };
     } else {
       statusCode = 500;
@@ -71,7 +72,9 @@ module.exports.sendStatusRequest = async (event) => {
 };
 
 module.exports.resendStatusRequest = async (event) => {
-  let { data, response, statusCode } = parseEvent(event);
+  const { data } = parseEvent(event);
+  let statusCode = 201;
+  let response = {};
   try {
     if (data.players && data.players.length > 0 && 'teamId' in data && 'dateTime' in data) {
       const { invalidNumbers, validNumbers } = checkNumbers(data.players);
@@ -101,7 +104,6 @@ module.exports.resendStatusRequest = async (event) => {
           updatePlayerStatusRecord({ ...player, gameId: data.gameId, teamId: data.teamId, playerId: player.id }),
         ),
       );
-      statusCode = 201;
       response = { invalidNumbers, result };
     } else {
       statusCode = 500;

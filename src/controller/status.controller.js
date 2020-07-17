@@ -5,10 +5,10 @@ const { setResponse, parseEvent, sumAttendance } = require('../helper');
 const { sendDeleteSMS, sendDeleteEmail } = require('../service/sendStatus.service');
 
 module.exports.searchStatus = async (event) => {
-  let { queryParams, response, statusCode } = parseEvent(event);
-
+  const { queryParams } = parseEvent(event);
+  let response = {};
+  let statusCode = 200;
   try {
-    statusCode = 200;
     console.info('Searching player Status for: ', JSON.stringify(queryParams));
     response = await searchStatusRecord(queryParams);
     if (response.Count > 0 && response.Items[0].players[queryParams.playerId]) {
@@ -32,10 +32,10 @@ module.exports.searchStatus = async (event) => {
 };
 
 module.exports.searchStatuses = async (event) => {
-  let { queryParams, response, statusCode } = parseEvent(event);
-
+  const { queryParams } = parseEvent(event);
+  let response = {};
+  let statusCode = 200;
   try {
-    statusCode = 200;
     response = await searchStatusRecord(queryParams);
     if (response.Count > 0) {
       response.Items[0]['attendance'] = sumAttendance(Object.values(response.Items[0].players));
@@ -52,10 +52,11 @@ module.exports.searchStatuses = async (event) => {
 };
 
 module.exports.deleteStatus = async (event) => {
-  let { data, response, statusCode } = parseEvent(event);
+  const { data } = parseEvent(event);
+  let response = {};
+  let statusCode = 200;
   try {
     if ('teamId' in data && 'gameId' in data) {
-      statusCode = 200;
       response = await deleteStatusRecord(data);
       const gameTime = new Date(response.Attributes.dateTime);
       const toSendSms = [];
@@ -95,10 +96,11 @@ module.exports.deleteStatus = async (event) => {
 };
 
 module.exports.updatePlayerStatus = async (event) => {
-  let { data, response, statusCode } = parseEvent(event);
+  let { data } = parseEvent(event);
+  let response = {};
+  let statusCode = 201;
   try {
     if ('teamId' in data && 'gameId' in data && 'playerId' in data && 'status' in data) {
-      statusCode = 201;
       console.info('Player updated status with info: ', JSON.stringify(data));
       response = await updatePlayerStatusRecord(data);
     } else {
