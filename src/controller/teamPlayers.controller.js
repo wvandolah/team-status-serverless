@@ -56,7 +56,6 @@ module.exports.search = async (event) => {
   let statusCode = 200;
   try {
     if (queryParams && 'userId' in queryParams) {
-      statusCode = 200;
       response = await searchTeamPlayerRecord(queryParams);
     } else {
       statusCode = 400;
@@ -80,7 +79,6 @@ module.exports.delete = async (event) => {
   let statusCode = 200;
   try {
     if ('userId' in queryParams && 'teamId' in queryParams) {
-      statusCode = 200;
       response = await deleteTeamPlayerRecord(queryParams);
     } else {
       statusCode = 400;
