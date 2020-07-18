@@ -6,7 +6,6 @@ const {
 } = require('../../src/service/sendStatus.service');
 const { SNS } = require('aws-sdk');
 const { SES } = require('aws-sdk');
-const { expressJwtSecret } = require('jwks-rsa');
 
 jest.mock('aws-sdk', () => {
   const mockedSNS = {

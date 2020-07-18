@@ -12,7 +12,13 @@ module.exports = async () => {
   Object.keys(service.functions)
     .map((funcName) => service.functions[funcName])
     .forEach((func) => {
-      Object.keys(func.environment).forEach((funcEnv) => (getEnv[funcEnv] = func.environment[funcEnv]));
+      Object.keys(func.environment).forEach((funcEnv) => {
+        if (funcEnv === 'jwksUri') {
+          getEnv[funcEnv] = 'https://test/.well-known/jwks.json';
+        } else {
+          getEnv[funcEnv] = func.environment[funcEnv];
+        }
+      });
     });
 
   process.env = {
