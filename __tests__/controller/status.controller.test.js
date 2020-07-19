@@ -9,7 +9,7 @@ const {
   deleteStatusRecord,
   updatePlayerStatusRecord,
 } = require('../../src/service/statusDB.service');
-const { sendDeleteSMS, sendDeleteEmail } = require('../../src/service/sendStatus.service');
+const { sendDeleteSMS, sendDeleteEmail, sendStatusSMS } = require('../../src/service/sendStatus.service');
 const { setResponse } = require('../../src/helper');
 
 jest.mock('../../src/service/statusDB.service', () => {
@@ -140,6 +140,99 @@ describe('status.controller', () => {
       const actual = await searchStatuses(event);
       const expected = setResponse(500, { error: 'testError' }, testTeams[0]);
       expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));
+      expect(actual.statusCode).toBe(expected.statusCode);
+    });
+  });
+
+  fdescribe('when deleting statusGame', () => {
+    test('it should return 200 when given valid team and game id and send notifications if game in future', async () => {
+      const event = { queryStringParameters: testTeams[0], body: JSON.stringify(testTeams[0]) };
+      deleteStatusRecord.mockImplementationOnce(() => {
+        const testDate = new Date('2030-07-19T06:14:35.749Z');
+        return {
+          Attributes: {
+            dateTime: testDate,
+            players: [
+              {
+                sendEmail: true,
+              },
+              {
+                sendText: true,
+              },
+            ],
+          },
+        };
+      });
+      const actual = await deleteStatus(event);
+      const expected = setResponse(200, {}, testTeams[0]);
+      expect(sendDeleteSMS.mock.calls).toHaveLength(1);
+      expect(sendDeleteEmail.mock.calls).toHaveLength(1);
+      expect(actual.statusCode).toBe(expected.statusCode);
+    });
+    test('it should return 200 when given valid team and game id and not send notifications if game in future and not send flags enabled', async () => {
+      const event = { queryStringParameters: testTeams[0], body: JSON.stringify(testTeams[0]) };
+      deleteStatusRecord.mockImplementationOnce(() => {
+        const testDate = new Date('2030-07-19T06:14:35.749Z');
+        return {
+          Attributes: {
+            dateTime: testDate,
+            players: [
+              {
+                sendEmail: false,
+              },
+              {
+                sendText: false,
+              },
+            ],
+          },
+        };
+      });
+      const actual = await deleteStatus(event);
+      const expected = setResponse(200, {}, testTeams[0]);
+      expect(sendDeleteSMS.mock.calls).toHaveLength(0);
+      expect(actual.statusCode).toBe(expected.statusCode);
+    });
+    test('it should return 200 when given valid team and game id and not send notifications if game in past', async () => {
+      const event = { queryStringParameters: testTeams[0], body: JSON.stringify(testTeams[0]) };
+      deleteStatusRecord.mockImplementationOnce(() => {
+        const testDate = new Date('2010-07-19T06:14:35.749Z');
+        return {
+          Attributes: {
+            dateTime: testDate,
+            players: [
+              {
+                sendEmail: true,
+              },
+              {
+                sendText: true,
+              },
+            ],
+          },
+        };
+      });
+      const actual = await deleteStatus(event);
+      const expected = setResponse(200, {}, testTeams[0]);
+      expect(sendDeleteSMS.mock.calls).toHaveLength(0);
+      expect(sendDeleteEmail.mock.calls).toHaveLength(0);
+      expect(actual.statusCode).toBe(expected.statusCode);
+    });
+    test('it should return 400 when given invalid team and game id', async () => {
+      const event = { queryStringParameters: testTeams[0], body: JSON.stringify({ fake: 'hello' }) };
+      const actual = await deleteStatus(event);
+      const expected = setResponse(400, {}, testTeams[0]);
+      expect(sendDeleteSMS.mock.calls).toHaveLength(0);
+      expect(sendDeleteEmail.mock.calls).toHaveLength(0);
+      expect(actual.statusCode).toBe(expected.statusCode);
+    });
+    test('it should return 500 when unable to delete', async () => {
+      const event = { queryStringParameters: testTeams[0], body: JSON.stringify(testTeams[0]) };
+      deleteStatusRecord.mockImplementationOnce(() => {
+        throw new Error('TestError');
+      });
+      const actual = await deleteStatus(event);
+      const expected = setResponse(500, {}, testTeams[0]);
+      expect(sendDeleteSMS.mock.calls).toHaveLength(0);
+      expect(sendDeleteEmail.mock.calls).toHaveLength(0);
       expect(actual.statusCode).toBe(expected.statusCode);
     });
   });

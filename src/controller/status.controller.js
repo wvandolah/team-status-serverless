@@ -77,7 +77,7 @@ module.exports.deleteStatus = async (event) => {
           }),
         );
         const sesReturn = await sendDeleteEmail(toSendEmail, response.Attributes);
-        console.warn('here', sesReturn);
+        console.info('here', sesReturn);
       }
     } else {
       response = {
