@@ -1,6 +1,10 @@
-const { create, search } = require('../../src/controller/teamPlayers.controller');
+const { create, search, deleteTeamPlayer } = require('../../src/controller/teamPlayers.controller');
 const { setResponse } = require('../../src/helper');
-let { createTeamPlayerRecord, searchTeamPlayerRecord } = require('../../src/service/teamPlayers.service');
+let {
+  createTeamPlayerRecord,
+  searchTeamPlayerRecord,
+  deleteTeamPlayerRecord,
+} = require('../../src/service/teamPlayers.service');
 
 const setSearchResponse = (results) => {
   return {
@@ -14,6 +18,7 @@ jest.mock('../../src/service/teamPlayers.service', () => {
   return {
     searchTeamPlayerRecord: jest.fn().mockReturnThis(),
     createTeamPlayerRecord: jest.fn().mockReturnThis(),
+    deleteTeamPlayerRecord: jest.fn().mockReturnThis(),
   };
 });
 describe('teamPlayers.controller', () => {
@@ -138,6 +143,37 @@ describe('teamPlayers.controller', () => {
       const actual = await search(event);
 
       const expected = setResponse(500, { error: 'Test Error' }, searchTerms);
+      expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));
+      expect(actual.statusCode).toBe(expected.statusCode);
+    });
+  });
+
+  describe('when deleting teamPlayer', () => {
+    test('it should delete when provided valid userId and teamId', async () => {
+      const event = { queryStringParameters: testTeams[0], body: JSON.stringify('') };
+      deleteTeamPlayerRecord.mockImplementationOnce(() => {
+        return testTeams[0];
+      });
+      const actual = await deleteTeamPlayer(event);
+      const expected = setResponse(200, testTeams[0], testTeams[0]);
+      expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));
+      expect(actual.statusCode).toBe(expected.statusCode);
+    });
+    test('it should not delete when not provided valid userId and teamId', async () => {
+      const event = { queryStringParameters: {}, body: JSON.stringify('') };
+      deleteTeamPlayerRecord.mockImplementationOnce(() => {
+        throw new Error('Test Error');
+      });
+      const actual = await deleteTeamPlayer(event);
+      const expected = setResponse(400, { error: 'userId and teamId is required' }, {});
+      expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));
+      expect(actual.statusCode).toBe(expected.statusCode);
+    });
+    test('it should 500 status when fails to delete', async () => {
+      const event = { queryStringParameters: testTeams[0], body: JSON.stringify('') };
+
+      const actual = await deleteTeamPlayer(event);
+      const expected = setResponse(500, { error: 'Test Error' }, testTeams[0]);
       expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));
       expect(actual.statusCode).toBe(expected.statusCode);
     });

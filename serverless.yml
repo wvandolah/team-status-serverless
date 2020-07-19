@@ -135,7 +135,7 @@ functions:
           cors: true
           authorizer: authFn
   deleteTeamPlayerRequest:
-    handler: src/controller/teamPlayers.controller.delete
+    handler: src/controller/teamPlayers.controller.deleteTeamPlayer
     environment:
       tableTeamPlayers: ${self:custom.tables.teamPlayers}
     events:

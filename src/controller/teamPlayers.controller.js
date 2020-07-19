@@ -73,7 +73,7 @@ module.exports.search = async (event) => {
   return setResponse(statusCode, response, queryParams);
 };
 
-module.exports.delete = async (event) => {
+module.exports.deleteTeamPlayer = async (event) => {
   let { queryParams } = parseEvent(event);
   let response = {};
   let statusCode = 200;
