@@ -9,7 +9,7 @@ const {
   deleteStatusRecord,
   updatePlayerStatusRecord,
 } = require('../../src/service/statusDB.service');
-const { sendDeleteSMS, sendDeleteEmail, sendStatusSMS } = require('../../src/service/sendStatus.service');
+const { sendDeleteSMS, sendDeleteEmail } = require('../../src/service/sendStatus.service');
 const { setResponse } = require('../../src/helper');
 
 jest.mock('../../src/service/statusDB.service', () => {
@@ -33,6 +33,7 @@ describe('status.controller', () => {
       teamId: 'statusTeam1',
       gameId: 'gameId1',
       playerId: 'playerId1',
+      status: 'in',
     },
     {
       teamId: 'statusTeam1',
@@ -144,7 +145,7 @@ describe('status.controller', () => {
     });
   });
 
-  fdescribe('when deleting statusGame', () => {
+  describe('when deleting statusGame', () => {
     test('it should return 200 when given valid team and game id and send notifications if game in future', async () => {
       const event = { queryStringParameters: testTeams[0], body: JSON.stringify(testTeams[0]) };
       deleteStatusRecord.mockImplementationOnce(() => {
@@ -234,6 +235,33 @@ describe('status.controller', () => {
       expect(sendDeleteSMS.mock.calls).toHaveLength(0);
       expect(sendDeleteEmail.mock.calls).toHaveLength(0);
       expect(actual.statusCode).toBe(expected.statusCode);
+    });
+  });
+
+  describe('when updating player status', () => {
+    test('it should return 201 when teamId, gameId, playerId, and status is provided', async () => {
+      const event = { body: JSON.stringify(testTeams[0]) };
+      updatePlayerStatusRecord.mockImplementationOnce(() => {
+        return testTeams[0];
+      });
+      const actual = await updatePlayerStatus(event);
+      const expected = setResponse(201, testTeams[0], testTeams[0]);
+      expect(actual.statusCode).toBe(expected.statusCode);
+      expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));
+    });
+    test('it should return 400 when teamId, gameId, playerId, and status is not provided', async () => {
+      const event = { body: JSON.stringify(testTeams[1]) };
+      updatePlayerStatusRecord.mockImplementationOnce(() => {
+        return testTeams[1];
+      });
+      const actual = await updatePlayerStatus(event);
+      const expected = setResponse(
+        400,
+        { error: 'Team, Game, playerNumber and status information not provided' },
+        testTeams[1],
+      );
+      expect(actual.statusCode).toBe(expected.statusCode);
+      expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));
     });
   });
 });
