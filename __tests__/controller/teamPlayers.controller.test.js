@@ -1,18 +1,10 @@
 const { create, search, deleteTeamPlayer } = require('../../src/controller/teamPlayers.controller');
 const { setResponse } = require('../../src/helper');
-let {
+const {
   createTeamPlayerRecord,
   searchTeamPlayerRecord,
   deleteTeamPlayerRecord,
 } = require('../../src/service/teamPlayers.service');
-
-const setSearchResponse = (results) => {
-  return {
-    Items: results,
-    Count: results.length,
-    ScannedCount: results.length,
-  };
-};
 
 jest.mock('../../src/service/teamPlayers.service', () => {
   return {
