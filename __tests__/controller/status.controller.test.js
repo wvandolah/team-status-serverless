@@ -263,5 +263,16 @@ describe('status.controller', () => {
       expect(actual.statusCode).toBe(expected.statusCode);
       expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));
     });
+    test('it should return 500 when unable to update', async () => {
+      jest.resetAllMocks();
+      const event = { body: JSON.stringify(testTeams[0]) };
+      updatePlayerStatusRecord.mockImplementationOnce(() => {
+        throw new Error('TestError');
+      });
+      const actual = await updatePlayerStatus(event);
+      const expected = setResponse(500, { error: 'TestError' }, testTeams[0]);
+      expect(actual.statusCode).toBe(expected.statusCode);
+      expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));
+    });
   });
 });
