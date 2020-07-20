@@ -1,7 +1,7 @@
 const { createStatusRecord, updatePlayerStatusRecord } = require('../../src/service/statusDB.service');
 const { sendStatusSMS, sendStatusEmail } = require('../../src/service/sendStatus.service');
 const { setResponse } = require('../../src/helper');
-const { sendStatusRequest } = require('../../src/controller/sendStatus.controller');
+const { sendStatusRequest, resendStatusRequest } = require('../../src/controller/sendStatus.controller');
 
 jest.mock('../../src/service/statusDB.service', () => {
   return {
@@ -79,6 +79,45 @@ describe('sendStatus.controller', () => {
         return { MessageId: 'MessageIdTest1' };
       });
       const actual = await sendStatusRequest(event);
+      const expected = setResponse(500, {}, validTestTeam);
+      expect(actual.statusCode).toEqual(expected.statusCode);
+    });
+  });
+  describe('when resendStatusRequest', () => {
+    test('it returns status 201 when given valid inputs', async () => {
+      const event = { queryStringParameters: '', body: JSON.stringify(validTestTeam) };
+      sendStatusEmail.mockImplementationOnce(() => {
+        return { sesReturn: '', sentEmails: testValidPlayers };
+      });
+      sendStatusSMS.mockImplementation(() => {
+        return { MessageId: 'MessageIdTest1' };
+      });
+      const actual = await resendStatusRequest(event);
+      const expected = setResponse(201, {}, validTestTeam);
+      expect(actual.statusCode).toEqual(expected.statusCode);
+    });
+    test('it returns status 400 when given inValid inputs', async () => {
+      const event = { queryStringParameters: '', body: JSON.stringify({}) };
+      sendStatusEmail.mockImplementationOnce(() => {
+        return { sesReturn: '', sentEmails: testValidPlayers };
+      });
+      sendStatusSMS.mockImplementation(() => {
+        return { MessageId: 'MessageIdTest1' };
+      });
+      const actual = await resendStatusRequest(event);
+      const expected = setResponse(400, {}, validTestTeam);
+      expect(actual.statusCode).toEqual(expected.statusCode);
+    });
+    test('it returns status 500 when unable to send', async () => {
+      jest.resetAllMocks();
+      const event = { queryStringParameters: '', body: JSON.stringify(validTestTeam) };
+      sendStatusEmail.mockImplementationOnce(() => {
+        throw new Error('TestError');
+      });
+      sendStatusSMS.mockImplementation(() => {
+        return { MessageId: 'MessageIdTest1' };
+      });
+      const actual = await resendStatusRequest(event);
       const expected = setResponse(500, {}, validTestTeam);
       expect(actual.statusCode).toEqual(expected.statusCode);
     });
