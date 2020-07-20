@@ -9,6 +9,7 @@ const sendSMS = (message, phoneNumber) => {
     Message: message,
     PhoneNumber: `+1${phoneNumber}`,
   };
+
   // Sending sms costs $0.0065/msg
   if (process.env.IS_OFFLINE) {
     console.warn(smsData);

@@ -58,7 +58,7 @@ module.exports.sendStatusRequest = async (event) => {
       await createStatusRecord(result);
       response = { invalidNumbers, result };
     } else {
-      statusCode = 500;
+      statusCode = 400;
       response = {
         error: 'Not all required data was provided',
       };
@@ -106,7 +106,7 @@ module.exports.resendStatusRequest = async (event) => {
       );
       response = { invalidNumbers, result };
     } else {
-      statusCode = 500;
+      statusCode = 400;
       response = {
         error: 'Not all required data was provided',
       };
