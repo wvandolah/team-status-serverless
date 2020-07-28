@@ -1,6 +1,5 @@
 module.exports = async () => {
   const serverless = new (require('serverless'))();
-
   await serverless.init();
   const service = await serverless.variables.populateService();
   const resources = service.resources.Resources;

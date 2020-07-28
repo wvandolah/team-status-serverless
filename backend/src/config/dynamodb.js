@@ -13,6 +13,7 @@ if (process.env.IS_OFFLINE || process.env.NODE_ENV) {
   };
 }
 
+const something = "this";
 const client = new DocumentClient(options);
 
 module.exports = client;

@@ -1,0 +1,58 @@
+service: gameattendanttasks
+# app and org for use with dashboard.serverless.com
+org: wvandolah
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  serverless-offline:
+    port: 4000
+  tables:
+    gameAttendants: "game-attendants-${self:custom.stage}"
+    teamPlayers: "team-player-${self:custom.stage}"
+  topics:
+    sendNotificationTopic: "${self:service}-${self:custom.stage}-send-notification-topic"
+  dynamodb:
+    stages:
+      - ${self:provider.stage}
+    start:
+      inMemory: true
+      migrate: true
+      stage: ${opt:stage, 'dev'}
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.tables.gameAttendants}"
+    - Effect: Deny
+      Action:
+        - SNS:Publish
+      Resource: "arn:aws:sns:*:*:*"
+    - Effect: Allow
+      Action:
+        - SNS:Publish
+      Resource: "*"
+
+functions:
+  sendSms:
+    handler: src/controller/sendNotification.sendSms
+    events:
+      - sns: ${self:custom.topics.sendNotificationTopic}
+
+
+
+
+
+
