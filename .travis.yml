@@ -66,4 +66,4 @@ jobs:
     - stage: deploy
       <<: *DEPLOY_SERVICE
       name: "Deploy tasks to AWS DEV"
-      env: SERVICE_PATH="backend"
+      env: SERVICE_PATH="tasks"
