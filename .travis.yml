@@ -30,7 +30,6 @@ testService: &TEST_SERVICE
     - cd -
 
   script:
-    - ls -d * */*
     - cd backend
     - npm run testCoverage
     - cd -
@@ -38,10 +37,10 @@ testService: &TEST_SERVICE
     - npm run testCoverage
     - cd -
     - sonar-scanner
-    workspaces:
-      create:
-        name: common
-        paths: ./
+  workspaces:
+    create:
+      name: common
+      paths: ./
 
 deployService: &DEPLOY_SERVICE
   install:
