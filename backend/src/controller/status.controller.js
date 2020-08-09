@@ -1,8 +1,8 @@
 'use strict';
 
 const { searchStatusRecord, deleteStatusRecord, updatePlayerStatusRecord } = require('../service/statusDB.service');
-const { setResponse, parseEvent, sumAttendance } = require('../helper');
-const { sendDeleteSMS, sendDeleteEmail } = require('../service/sendStatus.service');
+const { sendStatusTypes, setResponse, parseEvent, sumAttendance } = require('../helper');
+const { sendNotifications, sendDeleteEmail } = require('../service/sendStatus.service');
 
 module.exports.searchStatus = async (event) => {
   const { queryParams } = parseEvent(event);
@@ -69,15 +69,10 @@ module.exports.deleteStatus = async (event) => {
           toSendSms.push(player);
         }
       });
-
+      response.Attributes.players = Object.values(response.Attributes.players);
       if (new Date() < gameTime) {
-        await Promise.all(
-          toSendSms.map((player) => {
-            return sendDeleteSMS(player, response.Attributes);
-          }),
-        );
-        const sesReturn = await sendDeleteEmail(toSendEmail, response.Attributes);
-        console.info('here', sesReturn);
+        await sendDeleteEmail(toSendEmail, response.Attributes);
+        await sendNotifications(response.Attributes, sendStatusTypes.DELETE_GAME);
       }
     } else {
       response = {

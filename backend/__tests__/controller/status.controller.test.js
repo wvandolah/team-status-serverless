@@ -9,7 +9,7 @@ const {
   deleteStatusRecord,
   updatePlayerStatusRecord,
 } = require('../../src/service/statusDB.service');
-const { sendDeleteSMS, sendDeleteEmail } = require('../../src/service/sendStatus.service');
+const { sendDeleteSMS, sendDeleteEmail, sendNotifications } = require('../../src/service/sendStatus.service');
 const { setResponse } = require('../../src/helper');
 
 jest.mock('../../src/service/statusDB.service', () => {
@@ -24,6 +24,7 @@ jest.mock('../../src/service/sendStatus.service', () => {
   return {
     sendDeleteSMS: jest.fn().mockReturnThis(),
     sendDeleteEmail: jest.fn().mockReturnThis(),
+    sendNotifications: jest.fn().mockReturnThis(),
   };
 });
 
@@ -166,7 +167,6 @@ describe('status.controller', () => {
       });
       const actual = await deleteStatus(event);
       const expected = setResponse(200, {}, testTeams[0]);
-      expect(sendDeleteSMS.mock.calls).toHaveLength(1);
       expect(sendDeleteEmail.mock.calls).toHaveLength(1);
       expect(actual.statusCode).toBe(expected.statusCode);
     });
@@ -190,7 +190,6 @@ describe('status.controller', () => {
       });
       const actual = await deleteStatus(event);
       const expected = setResponse(200, {}, testTeams[0]);
-      expect(sendDeleteSMS.mock.calls).toHaveLength(0);
       expect(actual.statusCode).toBe(expected.statusCode);
     });
     test('it should return 200 when given valid team and game id and not send notifications if game in past', async () => {
@@ -213,7 +212,6 @@ describe('status.controller', () => {
       });
       const actual = await deleteStatus(event);
       const expected = setResponse(200, {}, testTeams[0]);
-      expect(sendDeleteSMS.mock.calls).toHaveLength(0);
       expect(sendDeleteEmail.mock.calls).toHaveLength(0);
       expect(actual.statusCode).toBe(expected.statusCode);
     });
@@ -221,7 +219,6 @@ describe('status.controller', () => {
       const event = { queryStringParameters: testTeams[0], body: JSON.stringify({ fake: 'hello' }) };
       const actual = await deleteStatus(event);
       const expected = setResponse(400, {}, testTeams[0]);
-      expect(sendDeleteSMS.mock.calls).toHaveLength(0);
       expect(sendDeleteEmail.mock.calls).toHaveLength(0);
       expect(actual.statusCode).toBe(expected.statusCode);
     });
@@ -232,7 +229,6 @@ describe('status.controller', () => {
       });
       const actual = await deleteStatus(event);
       const expected = setResponse(500, {}, testTeams[0]);
-      expect(sendDeleteSMS.mock.calls).toHaveLength(0);
       expect(sendDeleteEmail.mock.calls).toHaveLength(0);
       expect(actual.statusCode).toBe(expected.statusCode);
     });

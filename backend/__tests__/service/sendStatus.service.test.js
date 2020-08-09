@@ -1,16 +1,11 @@
-const {
-  sendStatusSMS,
-  sendDeleteSMS,
-  sendStatusEmail,
-  sendDeleteEmail,
-} = require('../../src/service/sendStatus.service');
+const { sendNotifications, sendStatusEmail, sendDeleteEmail } = require('../../src/service/sendStatus.service');
 const { SNS } = require('aws-sdk');
 const { SES } = require('aws-sdk');
 
 jest.mock('aws-sdk', () => {
   const mockedSNS = {
     publish: jest.fn().mockReturnThis(),
-    promise: jest.fn(),
+    promise: jest.fn().mockReturnThis(),
   };
   const mockedSES = {
     sendBulkTemplatedEmail: jest.fn().mockReturnThis(),
@@ -26,16 +21,6 @@ jest.mock('aws-sdk', () => {
 describe('sendStatus.service', () => {
   describe('when sending sms', () => {
     const sns = new SNS({ apiVersion: '2010-03-31', SMS: { smsType: 'Transactional' } });
-    const mockPlayer = { id: 'playerId', phoneNumber: '8178178171' };
-    const mockTeamGame = { teamName: 'dudeBros', dateTime: 'today', teamId: 'teamId' };
-    const mockGameId = 'gameId';
-    const message = `Confirm your status for ${mockTeamGame.teamName} game at ${mockTeamGame.dateTime}: https://teamstatus.wvandolah.com/statusUpdate?t=${mockTeamGame.teamId}&g=${mockGameId}&p=${mockPlayer.id}`;
-    const mockResponse = {
-      ResponseMetadata: {
-        RequestId: message,
-      },
-      MessageId: 'da5a27f3-a831-5158-8594-70f62df89f77',
-    };
     beforeEach(() => {
       process.env.IS_OFFLINE = '';
     });
@@ -43,27 +28,9 @@ describe('sendStatus.service', () => {
     afterEach(() => {
       jest.clearAllMocks();
     });
-    test('it should return list of sns request id when sending new game status', async () => {
-      sns.publish().promise.mockResolvedValueOnce(mockResponse);
-      const actual = await sendStatusSMS('string', '8179398675');
-      expect(actual).toEqual(mockResponse);
-    });
-    test('it should mock when offline and return actual msg when sending new game status', async () => {
-      process.env.IS_OFFLINE = true;
-      const actual = await sendStatusSMS(mockPlayer, mockTeamGame, mockGameId);
-      expect(actual).toEqual(mockResponse);
-    });
-    test('it should return list of sns request id when sending delete game status', async () => {
-      sns.publish().promise.mockResolvedValueOnce(mockResponse);
-      const actual = await sendDeleteSMS('string', '8179398675');
-      expect(actual).toEqual(mockResponse);
-    });
-    test('it should mock when offline and return actual msg when delete new game status', async () => {
-      process.env.IS_OFFLINE = true;
-      const deleteMessage = `${mockTeamGame.teamName} game at ${mockTeamGame.dateTime} has been canceled or rescheduled.`;
-      const actual = await sendDeleteSMS(mockPlayer, mockTeamGame, mockGameId);
-
-      expect(actual).toEqual({ ...mockResponse, ResponseMetadata: { RequestId: deleteMessage } });
+    test('it should publish received data to sns topic', async () => {
+      await sendNotifications('game Data', 0);
+      expect(sns.publish.mock.calls).toHaveLength(1);
     });
   });
 

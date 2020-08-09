@@ -1,8 +1,11 @@
-const { createStatusRecord, updatePlayerStatusRecord } = require('../../src/service/statusDB.service');
-const { sendStatusSMS, sendStatusEmail } = require('../../src/service/sendStatus.service');
+const {
+  createStatusRecord,
+  updatePlayerStatusRecord,
+  sendNotifications,
+} = require('../../src/service/statusDB.service');
+const { sendStatusEmail } = require('../../src/service/sendStatus.service');
 const { setResponse } = require('../../src/helper');
 const { sendStatusRequest, resendStatusRequest } = require('../../src/controller/sendStatus.controller');
-
 jest.mock('../../src/service/statusDB.service', () => {
   return {
     createStatusRecord: jest.fn().mockReturnThis(),
@@ -12,8 +15,19 @@ jest.mock('../../src/service/statusDB.service', () => {
 
 jest.mock('../../src/service/sendStatus.service', () => {
   return {
-    sendStatusSMS: jest.fn().mockReturnThis(),
     sendStatusEmail: jest.fn().mockReturnThis(),
+    sendNotifications: jest.fn(),
+  };
+});
+
+jest.mock('aws-sdk', () => {
+  const mockedSES = {
+    sendBulkTemplatedEmail: jest.fn().mockReturnThis(),
+    promise: jest.fn(),
+  };
+
+  return {
+    SES: jest.fn(() => mockedSES),
   };
 });
 
@@ -50,9 +64,6 @@ describe('sendStatus.controller', () => {
       sendStatusEmail.mockImplementationOnce(() => {
         return { sesReturn: '', sentEmails: testValidPlayers };
       });
-      sendStatusSMS.mockImplementation(() => {
-        return { MessageId: 'MessageIdTest1' };
-      });
       const actual = await sendStatusRequest(event);
       const expected = setResponse(201, {}, validTestTeam);
       expect(actual.statusCode).toEqual(expected.statusCode);
@@ -61,9 +72,6 @@ describe('sendStatus.controller', () => {
       const event = { queryStringParameters: '', body: JSON.stringify({}) };
       sendStatusEmail.mockImplementationOnce(() => {
         return { sesReturn: '', sentEmails: testValidPlayers };
-      });
-      sendStatusSMS.mockImplementation(() => {
-        return { MessageId: 'MessageIdTest1' };
       });
       const actual = await sendStatusRequest(event);
       const expected = setResponse(400, {}, validTestTeam);
@@ -74,9 +82,6 @@ describe('sendStatus.controller', () => {
       const event = { queryStringParameters: '', body: JSON.stringify(validTestTeam) };
       sendStatusEmail.mockImplementationOnce(() => {
         throw new Error('TestError');
-      });
-      sendStatusSMS.mockImplementation(() => {
-        return { MessageId: 'MessageIdTest1' };
       });
       const actual = await sendStatusRequest(event);
       const expected = setResponse(500, {}, validTestTeam);
@@ -89,9 +94,6 @@ describe('sendStatus.controller', () => {
       sendStatusEmail.mockImplementationOnce(() => {
         return { sesReturn: '', sentEmails: testValidPlayers };
       });
-      sendStatusSMS.mockImplementation(() => {
-        return { MessageId: 'MessageIdTest1' };
-      });
       const actual = await resendStatusRequest(event);
       const expected = setResponse(201, {}, validTestTeam);
       expect(actual.statusCode).toEqual(expected.statusCode);
@@ -100,9 +102,6 @@ describe('sendStatus.controller', () => {
       const event = { queryStringParameters: '', body: JSON.stringify({}) };
       sendStatusEmail.mockImplementationOnce(() => {
         return { sesReturn: '', sentEmails: testValidPlayers };
-      });
-      sendStatusSMS.mockImplementation(() => {
-        return { MessageId: 'MessageIdTest1' };
       });
       const actual = await resendStatusRequest(event);
       const expected = setResponse(400, {}, validTestTeam);
@@ -113,9 +112,6 @@ describe('sendStatus.controller', () => {
       const event = { queryStringParameters: '', body: JSON.stringify(validTestTeam) };
       sendStatusEmail.mockImplementationOnce(() => {
         throw new Error('TestError');
-      });
-      sendStatusSMS.mockImplementation(() => {
-        return { MessageId: 'MessageIdTest1' };
       });
       const actual = await resendStatusRequest(event);
       const expected = setResponse(500, {}, validTestTeam);

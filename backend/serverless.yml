@@ -25,7 +25,8 @@ custom:
       inMemory: true
       migrate: true
       stage: ${opt:stage, 'dev'}
-
+  topic: 
+    sendNotificationTopic: "gameattendanttasks-${self:custom.stage}-send-notification-topic"
 provider:
   name: aws
   runtime: nodejs10.x
@@ -48,6 +49,10 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.tables.teamPlayers}"
+    - Effect: Allow
+      Action:
+        - SNS:Publish
+      Resource: { "Fn::Join" : [":", ["arn:aws:sns:${opt:region, self:provider.region}", { "Ref" : "AWS::AccountId" }, "${self:custom.topic.sendNotificationTopic}" ] ]  }
 
 functions:
   authFn:
@@ -60,6 +65,7 @@ functions:
     handler: src/controller/sendStatus.controller.sendStatusRequest
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
+      sendNotificationTopicArn: { "Fn::Join" : [":", ["arn:aws:sns:${opt:region, self:provider.region}", { "Ref" : "AWS::AccountId" }, "${self:custom.topic.sendNotificationTopic}" ] ]  }
     events:
       - http:
           path: status
@@ -70,6 +76,7 @@ functions:
     handler: src/controller/sendStatus.controller.resendStatusRequest
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
+      sendNotificationTopicArn: { "Fn::Join" : [":", ["arn:aws:sns:${opt:region, self:provider.region}", { "Ref" : "AWS::AccountId" }, "${self:custom.topic.sendNotificationTopic}" ] ]  }
     events:
       - http:
           path: resend
@@ -90,6 +97,7 @@ functions:
     handler: src/controller/status.controller.deleteStatus
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
+      sendNotificationTopicArn: { "Fn::Join" : [":", ["arn:aws:sns:${opt:region, self:provider.region}", { "Ref" : "AWS::AccountId" }, "${self:custom.topic.sendNotificationTopic}" ] ]  }
     events:
       - http:
           path: status

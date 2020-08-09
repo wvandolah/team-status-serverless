@@ -1,8 +1,7 @@
 language: node_js
 
-cache:
-  directories:
-    - node_modules
+stages:
+  - test
 git:
   depth: false
   
@@ -12,13 +11,34 @@ notifications:
 node_js:
   - 10
 
-install:
-  - npm i
 
 addons:
   sonarcloud:
     organization: "wvandolah" # the key of the org you chose at step #3
 
-script:
-  - npm run testCoverage
-  - sonar-scanner
+
+testService: &TEST_SERVICE
+  install:
+    - ls
+    - cd backend
+    - travis_retry npm install
+    - cd -
+    - cd tasks
+    - travis_retry npm install
+    - cd -
+
+  script:
+    - ls -d * */*
+    - cd backend
+    - npm run testCoverage
+    - cd -
+    - cd tasks
+    - npm run testCoverage
+    - cd -
+    - sonar-scanner
+
+jobs:
+  include:
+    - stage: test
+      <<: *TEST_SERVICE
+      name: "Test"
