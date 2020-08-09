@@ -1,7 +1,4 @@
 service: gameattendanttasks
-# app and org for use with dashboard.serverless.com
-org: wvandolah
-
 plugins:
   - serverless-dynamodb-local
   - serverless-offline
