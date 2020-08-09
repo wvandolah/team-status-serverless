@@ -60,8 +60,10 @@ jobs:
       <<: *TEST_SERVICE
       name: "Test"
     - stage: deploy
+      <<: *DEPLOY_SERVICE
       name: "Deploy backend to AWS DEV"
       env: SERVICE_PATH="backend"
     - stage: deploy
+      <<: *DEPLOY_SERVICE
       name: "Deploy tasks to AWS DEV"
       env: SERVICE_PATH="backend"
