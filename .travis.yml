@@ -48,6 +48,7 @@ deployService: &DEPLOY_SERVICE
   
   script:
     - cd ${SERVICE_PATH}
+    - serverless config credentials --provider aws --key $AWS_ACCESS_KEY_ID --secret $AWS_SECRET_ACCESS_KEY
     - serverless deploy
     - cd -
   workspaces:
