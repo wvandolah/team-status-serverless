@@ -2,6 +2,8 @@ language: node_js
 
 stages:
   - test
+  - name: deployDev
+    if: branch = dev
 git:
   depth: false
   
@@ -36,9 +38,30 @@ testService: &TEST_SERVICE
     - npm run testCoverage
     - cd -
     - sonar-scanner
+    workspaces:
+      create:
+        name: common
+        paths: ./
+
+deployService: &DEPLOY_SERVICE
+  install:
+    npm install -g serverless
+  
+  script:
+    - cd ${SERVICE_PATH}
+    - serverless deploy
+    - cd -
+  workspaces:
+    use: common
 
 jobs:
   include:
     - stage: test
       <<: *TEST_SERVICE
       name: "Test"
+    - stage: deploy
+      name: "Deploy backend to AWS DEV"
+      env: SERVICE_PATH="backend"
+    - stage: deploy
+      name: "Deploy tasks to AWS DEV"
+      env: SERVICE_PATH="backend"
