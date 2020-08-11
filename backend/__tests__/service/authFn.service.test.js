@@ -1,4 +1,4 @@
-const { authFn } = require('../../src/service/authFn.service');
+const { authFn } = require('../../src/service/authFn');
 const createJWKSMock = require('mock-jwks').default;
 
 describe('authFn.service', () => {

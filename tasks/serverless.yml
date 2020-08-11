@@ -12,6 +12,8 @@ custom:
     teamPlayers: "team-player-${self:custom.stage}"
   topics:
     sendNotificationTopic: "${self:service}-${self:custom.stage}-send-notification-topic"
+  watchedLogGroups:
+    successSms: "sns/${opt:region, self:provider.region}/619887618095/DirectPublishToPhoneNumber"
   dynamodb:
     stages:
       - ${self:provider.stage}
@@ -47,7 +49,10 @@ functions:
     handler: src/controller/sendNotification.sendSms
     events:
       - sns: ${self:custom.topics.sendNotificationTopic}
-
+  failedSms:
+    handler: src/controller/smsLogs.failedSms
+    events:
+      - cloudwatchLog: ${self:custom.watchedLogGroups.successSms}
 
 
 

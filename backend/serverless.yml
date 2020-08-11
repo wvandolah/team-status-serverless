@@ -53,13 +53,13 @@ provider:
 
 functions:
   authFn:
-    handler: src/service/authFn.service.authFn
+    handler: src/service/authFn.authFn
     environment:
       jwksUri: ${self:custom.Auth0.jwksUri}
       audience: ${self:custom.Auth0.audience}
       issuer: ${self:custom.Auth0.issuer}
   sendStatusRequest:
-    handler: src/controller/sendStatus.controller.sendStatusRequest
+    handler: src/controller/sendStatus.sendStatusRequest
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
       sendNotificationTopicArn: { "Fn::Join" : [":", ["arn:aws:sns:${opt:region, self:provider.region}", { "Ref" : "AWS::AccountId" }, "${self:custom.topic.sendNotificationTopic}" ] ]  }
@@ -70,7 +70,7 @@ functions:
           cors: true
           authorizer: authFn
   resendStatusRequest:
-    handler: src/controller/sendStatus.controller.resendStatusRequest
+    handler: src/controller/sendStatus.resendStatusRequest
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
       sendNotificationTopicArn: { "Fn::Join" : [":", ["arn:aws:sns:${opt:region, self:provider.region}", { "Ref" : "AWS::AccountId" }, "${self:custom.topic.sendNotificationTopic}" ] ]  }
@@ -81,7 +81,7 @@ functions:
           cors: true
           authorizer: authFn
   searchStatusRequest:
-    handler: src/controller/status.controller.searchStatuses
+    handler: src/controller/status.searchStatuses
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
     events:
@@ -91,7 +91,7 @@ functions:
           cors: true
           authorizer: authFn
   deleteStatusRequest:
-    handler: src/controller/status.controller.deleteStatus
+    handler: src/controller/status.deleteStatus
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
       sendNotificationTopicArn: { "Fn::Join" : [":", ["arn:aws:sns:${opt:region, self:provider.region}", { "Ref" : "AWS::AccountId" }, "${self:custom.topic.sendNotificationTopic}" ] ]  }
@@ -102,7 +102,7 @@ functions:
           cors: true
           authorizer: authFn
   updatePlayerStatusRequest:
-    handler: src/controller/status.controller.updatePlayerStatus
+    handler: src/controller/status.updatePlayerStatus
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
     events:
@@ -111,7 +111,7 @@ functions:
           method: put
           cors: true
   searchPlayerStatusRequest:
-    handler: src/controller/status.controller.searchStatus
+    handler: src/controller/status.searchStatus
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
     events:
@@ -120,7 +120,7 @@ functions:
           method: get
           cors: true
   createTeamPlayerRequest:
-    handler: src/controller/teamPlayers.controller.create
+    handler: src/controller/teamPlayers.create
     environment:
       tableTeamPlayers: ${self:custom.tables.teamPlayers}
     events:
@@ -130,7 +130,7 @@ functions:
           cors: true
           authorizer: authFn
   searchTeamPlayerRequest:
-    handler: src/controller/teamPlayers.controller.search
+    handler: src/controller/teamPlayers.search
     environment:
       tableTeamPlayers: ${self:custom.tables.teamPlayers}
     events:
@@ -140,7 +140,7 @@ functions:
           cors: true
           authorizer: authFn
   deleteTeamPlayerRequest:
-    handler: src/controller/teamPlayers.controller.deleteTeamPlayer
+    handler: src/controller/teamPlayers.deleteTeamPlayer
     environment:
       tableTeamPlayers: ${self:custom.tables.teamPlayers}
     events:

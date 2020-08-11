@@ -5,7 +5,7 @@ const {
 } = require('../../src/service/statusDB.service');
 const { sendStatusEmail } = require('../../src/service/sendStatus.service');
 const { setResponse } = require('../../src/helper');
-const { sendStatusRequest, resendStatusRequest } = require('../../src/controller/sendStatus.controller');
+const { sendStatusRequest, resendStatusRequest } = require('../../src/controller/sendStatus');
 jest.mock('../../src/service/statusDB.service', () => {
   return {
     createStatusRecord: jest.fn().mockReturnThis(),
@@ -31,7 +31,7 @@ jest.mock('aws-sdk', () => {
   };
 });
 
-describe('sendStatus.controller', () => {
+describe('sendStatus', () => {
   const testValidPlayers = [
     {
       id: 'testId1',

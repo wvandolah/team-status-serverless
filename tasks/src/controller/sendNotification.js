@@ -1,3 +1,4 @@
+'use strict';
 const { sendStatusTypes } = require('../helper');
 const { SNS } = require('aws-sdk');
 const sns = new SNS({ apiVersion: '2010-03-31', SMS: { smsType: 'Transactional' } });

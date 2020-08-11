@@ -3,7 +3,7 @@ const {
   searchStatuses,
   deleteStatus,
   updatePlayerStatus,
-} = require('../../src/controller/status.controller');
+} = require('../../src/controller/status');
 const {
   searchStatusRecord,
   deleteStatusRecord,
@@ -28,7 +28,7 @@ jest.mock('../../src/service/sendStatus.service', () => {
   };
 });
 
-describe('status.controller', () => {
+describe('status', () => {
   const testTeams = [
     {
       teamId: 'statusTeam1',

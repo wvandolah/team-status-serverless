@@ -1,4 +1,4 @@
-const { create, search, deleteTeamPlayer } = require('../../src/controller/teamPlayers.controller');
+const { create, search, deleteTeamPlayer } = require('../../src/controller/teamPlayers');
 const { setResponse } = require('../../src/helper');
 const {
   createTeamPlayerRecord,
@@ -13,7 +13,7 @@ jest.mock('../../src/service/teamPlayers.service', () => {
     deleteTeamPlayerRecord: jest.fn().mockReturnThis(),
   };
 });
-describe('teamPlayers.controller', () => {
+describe('teamPlayers', () => {
   const testTeams = [
     {
       teamId: 'statusTeam1',
