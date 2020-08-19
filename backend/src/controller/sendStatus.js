@@ -16,8 +16,6 @@ module.exports.sendStatusRequest = async (event) => {
 
       const { sesReturn } = sendStatusEmail(data.players, data, gameId);
       await sesReturn;
-      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
-      // Returned values will be in order of the Promises passed, regardless of completion order.
       const result = buildResults({ ...data, gameId: gameId });
       await createStatusRecord(result);
       response = { result };
@@ -45,8 +43,6 @@ module.exports.resendStatusRequest = async (event) => {
       await sendNotifications(data, sendStatusTypes.NEW_GAME);
       const { sesReturn } = sendStatusEmail(data.players, data, data.gameId);
       await sesReturn;
-      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
-      // Returned values will be in order of the Promises passed, regardless of completion order.
       const result = buildResults(data);
       response = { result };
     } else {

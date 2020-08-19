@@ -59,14 +59,10 @@ module.exports.deleteStatus = async (event) => {
     if ('teamId' in data && 'gameId' in data) {
       response = await deleteStatusRecord(data);
       const gameTime = new Date(response.Attributes.dateTime);
-      const toSendSms = [];
       const toSendEmail = [];
       Object.values(response.Attributes.players).forEach((player) => {
         if (player.sendEmail) {
           toSendEmail.push(player);
-        }
-        if (player.sendText) {
-          toSendSms.push(player);
         }
       });
       response.Attributes.players = Object.values(response.Attributes.players);
