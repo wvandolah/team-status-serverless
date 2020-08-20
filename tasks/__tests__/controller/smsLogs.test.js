@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const { failedSms } = require('../../src/controller/smsLogs');
 const { snsEventSave, snsEventQuery } = require('../../src/service/notificationEventsDb');
 const { SNS } = require('aws-sdk');

@@ -58,6 +58,8 @@ functions:
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants.name}
       tableNotificationEvents: ${self:custom.tables.notificationEvents.name}
+      env: ${self:custom.stage}
+      baseUrl: https://teamstatus<stage>.wvandolah.com
     events:
       - sns: ${self:custom.topics.sendNotificationTopic}
   failedSms:
