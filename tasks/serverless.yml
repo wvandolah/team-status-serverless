@@ -72,6 +72,8 @@ functions:
       - sns: ${self:custom.topics.sendNotificationTopic}
   failedSms:
     handler: src/controller/smsLogs.failedSms
+    environment:
+      tableNotificationEvents: ${self:custom.tables.notificationEvents.name}
     events:
       - cloudwatchLog: ${self:custom.watchedLogGroups.successSms}
       - cloudwatchLog: ${self:custom.watchedLogGroups.failedSms}
