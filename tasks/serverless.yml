@@ -44,12 +44,14 @@ provider:
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.tables.gameAttendants.name}"
     - Effect: Allow
+      Action:
         - dynamodb:Query
         - dynamodb:Scan
         - dynamodb:GetItem
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
+        - dynamodb:BatchWriteItem
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.tables.notificationEvents.name}"
     - Effect: Deny
       Action:
@@ -74,6 +76,7 @@ functions:
     handler: src/controller/smsLogs.failedSms
     environment:
       tableNotificationEvents: ${self:custom.tables.notificationEvents.name}
+      baseUrl: https://teamstatus<stage>.wvandolah.com
     events:
       - cloudwatchLog: ${self:custom.watchedLogGroups.successSms}
       - cloudwatchLog: ${self:custom.watchedLogGroups.failedSms}

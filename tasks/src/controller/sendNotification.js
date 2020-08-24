@@ -1,6 +1,7 @@
 'use strict';
 const { sendMsg } = require('../service/sendNotification');
 const { snsEventSave } = require('../service/notificationEventsDb');
+
 const checkSendable = (player) => {
   const onlyNumber = player.phoneNumber.replace(/\D/g, '');
   return onlyNumber.length === 10 && player.sendText;
