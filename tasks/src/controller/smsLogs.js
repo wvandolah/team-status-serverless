@@ -13,7 +13,7 @@ module.exports.failedSms = async (event) => {
     console.log('[smsLogs]: received event unzipped: ', logEvents);
 
     const { Items } = await snsEventQuery(logEvents[0].notification.messageId);
-    console.log('[smsLogs]: saved sns event Items: ', Items);
+    console.log('[smsLogs]: retrieved saved sns event Items: ', Items);
     if (Items.length === 0) {
       console.log('[smsLogs]: snsId not found: ', logEvents[0].notification.messageId, 'logEvent: ', logEvents);
       return 'snsId not found';

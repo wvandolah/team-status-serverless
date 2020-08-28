@@ -138,7 +138,7 @@ describe('sendNotification', () => {
         .filter((player) => player.sendText)
         .map((player) => {
           const message = `Confirm your status for ${teamInfo.teamName} game at ${teamInfo.dateTime}: ${baseUrl}/statusUpdate?t=${teamInfo.teamId}&g=${teamInfo.gameId}&p=${player.id}`;
-          return [{ Message: message, PhoneNumber: `1${player.phoneNumber}` }];
+          return [{ Message: message, PhoneNumber: `+1${player.phoneNumber}` }];
         });
       expect(sns.publish.mock.calls).toEqual(sendPlayers);
     });
@@ -154,7 +154,7 @@ describe('sendNotification', () => {
         .filter((player) => player.sendText)
         .map((player) => {
           const message = `${teamInfo.teamName} game at ${teamInfo.dateTime} has been canceled or rescheduled.`;
-          return [{ Message: message, PhoneNumber: `1${player.phoneNumber}` }];
+          return [{ Message: message, PhoneNumber: `+1${player.phoneNumber}` }];
         });
       expect(sns.publish.mock.calls).toEqual(sendPlayers);
     });

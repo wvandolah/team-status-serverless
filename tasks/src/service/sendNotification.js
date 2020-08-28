@@ -24,7 +24,7 @@ module.exports = {
   sendMsg: (messageInfo, teamInfo, player) => {
     const smsData = {
       Message: getMessage(messageInfo.statusType, teamInfo, player),
-      PhoneNumber: `1${player.phoneNumber}`,
+      PhoneNumber: `+1${player.phoneNumber}`,
     };
     return sns.publish(smsData).promise();
   },
