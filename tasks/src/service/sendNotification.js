@@ -1,6 +1,6 @@
 'use strict';
 const { SNS } = require('aws-sdk');
-const sns = new SNS({ apiVersion: '2010-03-31', SMS: { smsType: 'Transactional' } });
+const sns = new SNS({ apiVersion: '2010-03-31', SMS: { smsType: 'Transactional' }, region: 'us-east-1' });
 const { sendStatusTypes } = require('../helper');
 
 const getMessage = (statusType, teamInfo, player) => {
@@ -22,9 +22,10 @@ const getMessage = (statusType, teamInfo, player) => {
 
 module.exports = {
   sendMsg: (messageInfo, teamInfo, player) => {
+    console.log('*************', player.phoneNumber);
     const smsData = {
       Message: getMessage(messageInfo.statusType, teamInfo, player),
-      PhoneNumber: `+1${player.phoneNumber}`,
+      PhoneNumber: `+1${player.phoneNumber.trim()}`,
     };
     return sns.publish(smsData).promise();
   },

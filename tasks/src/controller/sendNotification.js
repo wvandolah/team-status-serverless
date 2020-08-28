@@ -3,8 +3,7 @@ const { sendMsg } = require('../service/sendNotification');
 const { snsEventSave } = require('../service/notificationEventsDb');
 
 const checkSendable = (player) => {
-  const onlyNumber = player.phoneNumber.replace(/\D/g, '');
-  return onlyNumber.length === 10 && player.sendText;
+  return player.phoneNumber.length === 10 && player.sendText;
 };
 
 module.exports.sendSms = async (event) => {
@@ -12,7 +11,10 @@ module.exports.sendSms = async (event) => {
     const messageInfo = JSON.parse(event.Records[0].Sns.Message);
     const teamInfo = messageInfo.data;
     console.log('sendSms lambda received msg: ', messageInfo);
-    const smsPlayers = teamInfo.players.filter((player) => checkSendable(player));
+    const smsPlayers = teamInfo.players.filter((player) => {
+      player.phoneNumber = player.phoneNumber.replace(/\D/g, '');
+      return checkSendable(player);
+    });
     const snsIds = await Promise.all(
       smsPlayers.map((player) => {
         return sendMsg(messageInfo, teamInfo, player);
