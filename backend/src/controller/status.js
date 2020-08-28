@@ -39,7 +39,7 @@ module.exports.searchStatuses = async (event) => {
     response = await searchStatusRecord(queryParams);
     if (response.Count > 0) {
       for (let i = 0; i < response.Count; i++) {
-        response.Items[i]['attendance'] = sumAttendance(Object.values(response.Items[0].players));
+        response.Items[i]['attendance'] = sumAttendance(Object.values(response.Items[i].players));
       }
     }
   } catch (err) {

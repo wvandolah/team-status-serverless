@@ -2,7 +2,7 @@
 
 const { setResponse, parseEvent, sendStatusTypes } = require('../helper');
 const { sendNotifications, sendStatusEmail } = require('../service/sendStatus.service');
-const { createStatusRecord } = require('../service/statusDB.service');
+const { createStatusRecord, updatePlayerStatusRecord } = require('../service/statusDB.service');
 const shortid = require('shortid');
 
 module.exports.sendStatusRequest = async (event) => {
@@ -44,6 +44,11 @@ module.exports.resendStatusRequest = async (event) => {
       const { sesReturn } = sendStatusEmail(data.players, data, data.gameId);
       await sesReturn;
       const result = buildResults(data);
+      await Promise.all(
+        Object.values(result.players).map((player) =>
+          updatePlayerStatusRecord({ ...player, gameId: data.gameId, teamId: data.teamId, playerId: player.id }),
+        ),
+      );
       response = { result };
     } else {
       statusCode = 400;
@@ -70,7 +75,7 @@ const buildResults = (data) => {
     players: {},
   };
   data.players.forEach((player) => {
-    result.players[player.id] = { ...player, status: null };
+    result.players[player.id] = { ...player, status: null, smsDelivered: null };
   });
   return result;
 };
