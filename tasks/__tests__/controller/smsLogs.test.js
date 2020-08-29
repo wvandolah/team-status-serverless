@@ -2,6 +2,7 @@
 const { failedSms } = require('../../src/controller/smsLogs');
 const { snsEventSave, snsEventQuery } = require('../../src/service/notificationEventsDb');
 const { SNS } = require('aws-sdk');
+const sns = new SNS({ apiVersion: '2010-03-31', SMS: { smsType: 'Transactional' }, region: 'us-east-1' });
 
 // event will be a base64 zip file
 // { awslogs:
@@ -43,6 +44,13 @@ Mkb09vvwFLOQXi`,
 const validFailedEvent = {
   awslogs: {
     data: `eJxlUmFP2zAQ/SuRvw4Xn+04dr91tEWVgFWkZZpWNLmJWywSJ4qdIoT47zjp0DbtW/zu7r137/KGauO9PprNa2vQFM1nm9mv20Wez64X6AI1L850ERagpMwESKLSCFfN8bpr+jZWvPOXvcdG+4Dh8u++y7ntTBHW/b6y/mnTrJ8aZ+76eh8ZR4o8dEbXkSMt2Z4TU2KAkmNeHDhWFChWJDtQfcgUHVV9v/dFZ9tgG7e0VTCdR9Of6Khro0MwrtQuBO2fPS7NCS+1rUyZ1/6mOfr8v9GrqunL7zoUT7EO+Ad/kMuHjMgtp+hxtLc4GRcGhTdky+iSpQIyIIxwRSWQuKOgaaYUVwJACMVEKgFkKjIlKIs4hzQFJqLzYGPKQdcxMEhVBlQAyySwi8/0I/3bDrkm2IMt9OByh6YR+V1elfG5QwYORArgmGlicCo5wzqDFJew33MptT4YtUMXuz964xgllGAiMbAExDTlUyonGU936D22lqayJ9O9nvXa4UZXuuus6cbZfH2/utskeRsv2fV1cjNZT0aJ2hWxQUoSv9141G+H27Pbte6Cj0UY6X2w7nOjHfoCQlJOFQfKRp62s4VZuW0+j3UyIUTwNMK+9sMfOc5sOu28LgYOXZ3Fi0GcAYwEzcmWprs3vm2cP498rZri2ZSJ9olvdZ3sX5NxtaT43G3w9mKqahOjuh3csgz+xbYu2GpuTtHfrHge9mGKDZHFZEPvR53lbHWzvV/EKNH74/sHreMHKA==`,
+  },
+};
+
+const validFailedEvent2 = {
+  awslogs: {
+    data:
+      'H4sIAAAAAAAAAGVSXW/bMAz8K4Ee9rKqkWRbH3kLmqQI0GxFna4YlmKQbToRasuBJKcIiv73yc6KbdgbxSPvTiTfUAve6z1sz0dAM7SYb+c/N8s8n98u0RXqXi24mOZUSSk4lURlMd10+1vX9ceIeOunvcegfcB0+nfddGEclOG+LxrjD9vu/tBZ+NK3BbjpSpumd3ChyoMD3UYuCYrVMuVYCSZwKkBgmUKKq6yoi1pkVMOg7vvCl84cg+nsyjQBnEezH2ivW9AhgK20DUH7F48rOOFBCqq89Xfd3uf/td40XV896VAeIs4wvVvL7+tv+eZ29fSEnkd/yxPYMEi8IVNFm0nGM8YzlSlBEx6jlAnK0pQomQwYl1yRhFAuqWQkyRKVJUIxEq0HE8cddBsnRzMlBSNZKjPOrj7WEOnfdsh2wdSm1IPNHZrFzG94XcXnDkVeUSc6xWWiAWdVkeJCVTXWKSdpXUfJMhZe7f7ojW2MMIKJxExNqJgRNmP0OuFih95jaQWNOYE7X/SOw7JutHMG3Ng7337aTjZdYRoTziN3a8uIxFXH2I5r/VpvLjbvtQt+AEdeH4z9+MoOfaaSCpUoyUU28hydKWFtH/NFxMk1ITzNYtq3frjJsWfrtPW6HDh0cxEvB/GE0pGgO5kK3AP4Y2f9pWW8tonxk7J3Lu6vOU96G++sPOiigWlv9SkexhCPfNUrNM02Tmsz+GaE/5t7tME0CzhFp/PyZfgZJckwtTjc0PtRcTVf3z0+LOM00fvz+y8E1gJ2WQMAAA==',
   },
 };
 const validSuccessEventMsgs = [
@@ -130,6 +138,16 @@ describe('smsLogs', () => {
     statusType: 0,
     retries: 0,
   };
+
+  const validSaved = {
+    statusType: 0,
+    snsMessageId: '1827f3a4-c3ae-5db4-b9df-a4604ff353cd',
+    retries: 0,
+    players: [
+      { phoneNumber: '8179398675', playerId: '_6tVhnSou', snsMessageId: '1827f3a4-c3ae-5db4-b9df-a4604ff353cd' },
+    ],
+    teamInfo: { teamName: 'A', dateTime: '8/29/2020, 12:02:17 PM', gameId: 'H6BeDba5K', teamId: '9hie_SVJi' },
+  };
   const maxTries = {
     teamInfo: { teamName: 'testing2s', dateTime: '7/30/2020, 3:44:31 PM', teamId: 'VyXY1ikPw', gameId: 'gameId' },
     players: [
@@ -142,6 +160,10 @@ describe('smsLogs', () => {
     statusType: 0,
     retries: 3,
   };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   describe('given a valid base64 zip', () => {
     test('it decodes and returns logEvent messages array', async () => {
@@ -181,6 +203,17 @@ describe('smsLogs', () => {
       await snsEventSave(maxTries);
       const actual = await failedSms(validFailedEvent);
       expect(actual).toBe('max retries reach');
+    });
+    test('it should send correct and update send count for event if status is FAILURE', async () => {
+      await snsEventSave(validSaved);
+      const actual = await failedSms(validFailedEvent2);
+      const newSaved = await snsEventQuery('da5a27f3-a831-5158-8594-70f62df89f77');
+      expect(sns.publish.mock.calls[0]).toHaveLength(1);
+      expect(sns.publish.mock.calls[0][0]).toEqual({
+        Message:
+          'Confirm your status for A game at 8/29/2020, 12:02:17 PM: https://teamstatus-dev.wvandolah.com/statusUpdate?t=9hie_SVJi&g=H6BeDba5K&p=undefined',
+        PhoneNumber: '+18179398675',
+      });
     });
   });
 });

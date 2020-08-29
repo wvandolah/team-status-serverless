@@ -21,12 +21,12 @@ const getMessage = (statusType, teamInfo, player) => {
 };
 
 module.exports = {
-  sendMsg: (messageInfo, teamInfo, player) => {
-    console.log('*************', player.phoneNumber);
+  sendMsg: (statusType, teamInfo, player) => {
     const smsData = {
-      Message: getMessage(messageInfo.statusType, teamInfo, player),
-      PhoneNumber: `+1${player.phoneNumber.trim()}`,
+      Message: getMessage(statusType, teamInfo, player),
+      PhoneNumber: `+1${player.phoneNumber.replace(/\D/g, '')}`,
     };
+    console.log('[sendNotification.service]: publishing sms data: ', smsData);
     return sns.publish(smsData).promise();
   },
 };

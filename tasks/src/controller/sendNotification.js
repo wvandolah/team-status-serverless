@@ -17,7 +17,7 @@ module.exports.sendSms = async (event) => {
     });
     const snsIds = await Promise.all(
       smsPlayers.map((player) => {
-        return sendMsg(messageInfo, teamInfo, player);
+        return sendMsg(messageInfo.statusType, teamInfo, player);
       }),
     );
     const result = {
