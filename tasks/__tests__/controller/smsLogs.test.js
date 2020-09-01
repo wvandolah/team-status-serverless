@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 const { failedSms } = require('../../src/controller/smsLogs');
 const { snsEventSave, snsEventQuery } = require('../../src/service/notificationEventsDb');
+const { searchStatusRecord } = require('../helper');
 const { SNS } = require('aws-sdk');
 const sns = new SNS({ apiVersion: '2010-03-31', SMS: { smsType: 'Transactional' }, region: 'us-east-1' });
 
@@ -166,10 +167,17 @@ describe('smsLogs', () => {
   });
 
   describe('given a valid base64 zip', () => {
-    test('it decodes and returns logEvent messages array', async () => {
+    beforeAll(async () => {
       await snsEventSave(validInput2);
+    });
+    test('it decodes and returns logEvent messages array', async () => {
       const actual = await failedSms(validSuccessEvent);
       expect(actual).toEqual(validSuccessEventMsgs);
+    });
+    test('it should update tableGameAttendants with success for player', async () => {
+      await failedSms(validSuccessEvent);
+      const actual = await searchStatusRecord('VyXY1ikPw', 'gameId');
+      expect(actual.Items[0].players['ZV0xu8M1p'].smsDelivered).toBe('success');
     });
     test('it should resent and update send count for event if status is FAILURE', async () => {
       await snsEventSave(validInput);

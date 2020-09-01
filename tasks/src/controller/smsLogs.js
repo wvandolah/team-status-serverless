@@ -1,7 +1,9 @@
 'use strict';
 const zlib = require('zlib');
 const { snsEventQuery, snsEventSave } = require('../service/notificationEventsDb');
+const { updateSmsDeliveryStatus } = require('../service/statusDB');
 const { sendMsg } = require('../service/sendNotification');
+const { smsDeliveryTypes } = require('../helper');
 module.exports.failedSms = async (event) => {
   const { data } = event.awslogs;
   try {
@@ -20,6 +22,9 @@ module.exports.failedSms = async (event) => {
     }
     if (logEvents[0].status === 'SUCCESS') {
       console.log('[smsLogs]: successful: ', logEvents[0].notification.messageId);
+      const { teamId, gameId } = Items[0].teamInfo;
+      const { playerId } = Items[0].player;
+      await updateSmsDeliveryStatus(teamId, gameId, playerId, smsDeliveryTypes.SUCCESS);
       return logEvents;
     }
 
