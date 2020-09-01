@@ -147,18 +147,6 @@ describe('statusDB.service', () => {
         updatePlayerStatusParams.status,
       );
     });
-    test('should update snsId when not given status', async () => {
-      const updatePlayerStatusParams = { ...updatePlayerBaseParams, smsDelivered: 'updateStatus' };
-      const actual = await updatePlayerStatusRecord(updatePlayerStatusParams);
-      expect(actual.Attributes.players[updatePlayerStatusParams.playerId].smsDelivered).toEqual(
-        updatePlayerStatusParams.smsDelivered,
-      );
-    });
-    test('should not update status when not given status', async () => {
-      const updatePlayerStatusParams = { ...updatePlayerBaseParams, smsDelivered: 'updateStatus' };
-      const actual = await updatePlayerStatusRecord(updatePlayerStatusParams);
-      expect(actual.Attributes.players[updatePlayerStatusParams.playerId].status).toEqual('startStatus');
-    });
   });
 });
 

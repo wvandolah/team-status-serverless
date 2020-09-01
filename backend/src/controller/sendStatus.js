@@ -44,11 +44,6 @@ module.exports.resendStatusRequest = async (event) => {
       const { sesReturn } = sendStatusEmail(data.players, data, data.gameId);
       await sesReturn;
       const result = buildResults(data);
-      await Promise.all(
-        Object.values(result.players).map((player) =>
-          updatePlayerStatusRecord({ ...player, gameId: data.gameId, teamId: data.teamId, playerId: player.id }),
-        ),
-      );
       response = { result };
     } else {
       statusCode = 400;
