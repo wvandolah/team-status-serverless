@@ -308,18 +308,100 @@ module.exports = {
       teamId: 'VyXY1ikPw',
       teamName: 'A',
     },
+    {
+      dateTime: '8/29/2020, 2:36:31 PM',
+      gameId: 'gameIdFor3rdFailedTest',
+      opponentName: null,
+      players: {
+        playerIdFor3rdFailedTest: {
+          email: 'william.vandolah@gmail.com',
+          firstName: 'William1',
+          id: 'playerIdFor3rdFailedTest',
+          lastName: 'VanDolah',
+          phoneNumber: '8178178171',
+          sendText: true,
+          smsDelivered: null,
+          status: null,
+          type: null,
+        },
+      },
+      teamId: 'teamIdFor3rdFailedTest',
+      teamName: 'A',
+    },
   ],
   'notification-events-dev': [
     {
       statusType: 0,
-      snsMessageId: 'f24cce2f-346d-5ebe-b864-99eb84ef1578',
+      snsMessageId: '1827f3a4-c3ae-5db4-b9df-a4604ff353cd',
       retries: 0,
       player: {
         phoneNumber: '8178178171',
-        playerId: '_6tVhnSou',
-        snsMessageId: 'f24cce2f-346d-5ebe-b864-99eb84ef1578',
+        id: '_6tVhnSou',
+        snsMessageId: '1827f3a4-c3ae-5db4-b9df-a4604ff353cd',
       },
       teamInfo: { teamName: 'A', dateTime: '8/29/2020, 2:36:31 PM', gameId: '7rQx-4ogw', teamId: '9hie_SVJi' },
+    },
+
+    // Log data that contains snsID: 0486ea62-245b-5bc2-842c-bdce11872257
+    //   awslogs: {
+    //     data: `eJxlU9Fq2zAU/ZWgh72saiXZkuW8haQthWUrtdMxljJk+SYRteVgKSmh9N937bRsY+AH+9x7zzn3SH4lLYRgtlCe9kCmZDErZ7+W10Uxu70mF6R78dAjrHiudaa4ZrlEuOm2t3132GMl+HB1CBRMiJRf/d13tXA92Hh/
+    // qBoXdmV3v+s8fD20FTKOFEXswbTIIeukShnUlPM6pandpDQXXNCcZRthNlkuRtVwqILt3T66zt+4JkIfyP
+    // Qn2ZoWTIzga+NjNOE50BqO9Ma4BuqiDV+6bSj+G5033aH+bqLdYZ3TH+mjvnnMmF6lgjyN9q6P4OOg8Epc
+    // jS4TqXjGWcLSXGjOcEclZJbnaa44VypPlNSca6myXIkE8ZRLyROFzqPDlKNpMTAu84wLxZNM8+TiI32kf1
+    // 0T30W3cdYMLtdkish7+a7GzzVhqVZglKAilRWVlRVUp8LSqraAyplAP2tysf6jN44JJhhlGtOdMDmVeirF
+    // Zar1mrxhaw2NO0J/OuvthzOam7530I+zs/JTOVl2lWtcPI3crbdYwe3x3Y+n+W2zPNu8N30MQ3HkDdH5j1
+    // XW5DPXHM80GZ6RZ987C3d+VSywzi4ZU6lEOLRhuIrjTNkbH4wdOExzFreDeML5SNAdXQ39A4R958N55N3J
+    // ZGfCpALwE2Mt7CPUk+o0GbcbeeoXaJoSU1oOfgVj/2IrH12zgCM6nNln7FBM4LUe8sJY4yGMWsVqPsc/BX
+    // Mkb09vvwFLOQXi`,
+    //   },
+    {
+      teamInfo: { teamName: 'testing2s', dateTime: '7/30/2020, 3:44:31 PM', teamId: 'VyXY1ikPw', gameId: 'gameId' },
+      snsMessageId: '0486ea62-245b-5bc2-842c-bdce11872257',
+      player: {
+        phoneNumber: '8179391234',
+        id: 'ZV0xu8M1p',
+        snsMessageId: '0486ea62-245b-5bc2-842c-bdce11872257',
+      },
+      statusType: 0,
+      retries: 0,
+    },
+    // Log data that contains snsID: e1f08614-3a0e-5843-a715-d1bb488aafe9 for a failed sns event
+    // awslogs: {
+    //   data: `eJxlUmFP2zAQ/SuRvw4Xn+04dr91tEWVgFWkZZpWNLmJWywSJ4qdIoT47zjp0DbtW/zu7r137/KGauO9PprNa2vQFM1nm9mv20Wez64X6AI1L850ERagpMwESKLSCFfN8bpr+jZWvPOXvcdG+4Dh8u++y7ntTBHW/b6y/mnTrJ8aZ+76eh8ZR4o8dEbXkSMt2Z4TU2KAkmNeHDhWFChWJDtQfcgUHVV9v/dFZ9tgG7e0VTCdR9Of6Khro0MwrtQuBO2fPS7NCS+1rUyZ1/6mOfr8v9GrqunL7zoUT7EO+Ad/kMuHjMgtp+hxtLc4GRcGhTdky+iSpQIyIIxwRSWQuKOgaaYUVwJACMVEKgFkKjIlKIs4hzQFJqLzYGPKQdcxMEhVBlQAyySwi8/0I/3bDrkm2IMt9OByh6YR+V1elfG5QwYORArgmGlicCo5wzqDFJew33MptT4YtUMXuz964xgllGAiMbAExDTlUyonGU936D22lqayJ9O9nvXa4UZXuuus6cbZfH2/utskeRsv2fV1cjNZT0aJ2hWxQUoSv9141G+H27Pbte6Cj0UY6X2w7nOjHfoCQlJOFQfKRp62s4VZuW0+j3UyIUTwNMK+9sMfOc5sOu28LgYOXZ3Fi0GcAYwEzcmWprs3vm2cP498rZri2ZSJ9olvdZ3sX5NxtaT43G3w9mKqahOjuh3csgz+xbYu2GpuTtHfrHge9mGKDZHFZEPvR53lbHWzvV/EKNH74/sHreMHKA==`,
+    // },
+    {
+      teamInfo: { teamName: 'testing2s', dateTime: '7/30/2020, 3:44:31 PM', teamId: 'VyXY1ikPw', gameId: 'gameId' },
+      snsMessageId: 'e1f08614-3a0e-5843-a715-d1bb488aafe9',
+      player: {
+        phoneNumber: '8179391234',
+        id: 'ZV0xu8M1p',
+        snsMessageId: 'e1f08614-3a0e-5843-a715-d1bb488aafe9',
+      },
+
+      statusType: 0,
+      retries: 0,
+    },
+    // Log data that contains snsID: 1f3eeac3-3cd0-5318-95d4-bd197b58dee3 for a failed sns event,
+    // awslogs: {
+    //   data:
+    //     'H4sIAAAAAAAAAGVSXW/bIBT9KxEPe1lpwBgDeYuapIrUbFXtrpqWasJAE1QbR4BTRVH/+7Czapv2BvdwPrj3nkFrQpA7U50OBszAYl7Nf26WZTm/XYIr0L0541O5wIJzVmCOBE3lptvd+q4/JCS4MO0DNDJEiKd/v5surDcq3vd1Y8O+6u73nTNf+rY2frqStum9uUiV0RvZJi2aYSQEQxBLxGGOJYMC0QzWkmulqOaSkkQJfR2Ut4doO7eyTTQ+gNkPsJOtkTEap6WLUYbXALU5wsHK6LINd90ulP9Rb5qu108yqn3CM4jv1vz7+lu5uV09PYHnMd/yaFwcLM7A6hST0ILnOU5JOS0yQikuBBMCMZEThlHOC0w4JpSxgjEk8ixjHOW4SNGjTe2Osk2dwwVCOM8ZISTDVx9jSPLnLXBdtC9WySHmFsxS5Te81um6BfiFGCMVgURpBCnBHAqqc1hrLFhNuTaGbMHV9o/fSMtQhiASENMJymeEz0h2XfD08j091aaxR+NPF7/DMKwb6b01fuTOq0/VZNPVtrHxNGq3TiUkjTqd3TjWry+bS8x76WMYwFE3ROs+vrIFnzHHTBDBC0ZHnYO3yqzdY7lIOLpGqMhpKoc2DDs5ciovXZBq0JDNxVwN5gTjUaA7Wm38gwmHzoULZdy2iQ0T1Xuf5tecJr1Le6b2sm7MtHfymBZjOI96+s00TZW6tRlyZ5j+W3t00TYLc0xJ5+p1+BliZOhaam7sw+i4mq/vHh+WqZvg/fn9F4ohmnZZAwAA',
+    // },
+    {
+      teamInfo: {
+        teamName: 'incorrect',
+        dateTime: '7/30/2020, 3:44:31 PM',
+        teamId: 'teamIdFor3rdFailedTest',
+        gameId: 'gameIdFor3rdFailedTest',
+      },
+      snsMessageId: '1f3eeac3-3cd0-5318-95d4-bd197b58dee3',
+      player: {
+        phoneNumber: 'incorrect',
+        id: 'playerIdFor3rdFailedTest',
+        snsMessageId: 'e1f08614-3a0e-5843-a715-d1bb488aafe9',
+      },
+
+      statusType: 0,
+      retries: 3,
     },
   ],
 };

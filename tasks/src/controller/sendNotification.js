@@ -28,7 +28,7 @@ module.exports.sendSms = async (event) => {
         gameId: teamInfo.gameId,
       },
       players: smsPlayers.map((player, i) => {
-        return { phoneNumber: player.phoneNumber, playerId: player.id, snsMessageId: snsIds[i].MessageId };
+        return { phoneNumber: player.phoneNumber, id: player.id, snsMessageId: snsIds[i].MessageId };
       }),
       statusType: messageInfo.statusType,
     };

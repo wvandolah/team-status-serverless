@@ -5,30 +5,6 @@ const { searchStatusRecord } = require('../helper');
 const { SNS } = require('aws-sdk');
 const sns = new SNS({ apiVersion: '2010-03-31', SMS: { smsType: 'Transactional' }, region: 'us-east-1' });
 
-// event will be a base64 zip file
-// { awslogs:
-//  { data:
-// 'H4sIAAAAAAAAAGVT0W6bMBT9FeSHvaxuMdjGGgBVovy+WvzXVRLG+v0QXqX5wZocxJLkTGiYhzBuW2392O/WEAxDt/dfDYSB8wufq772ptR6PC/aFurd+X/f2+d+broauBcaYowmhkBxwq4TwXiuM4FQpTzTnOWZziRiZc59w0QlIY8Yfaq9EOwfbuxrbBjB4tfqKd7IwMwTgtXQjSP3uszRHfSNsaXXT+S7/zxX+jq7Y/6O8yqD3gBP+gj+LmMYvFliboabZ3fTQuTAqvyGpwmTJOMhFnKWdpLihlST6tm1FKRcrihBHG8ml5lghKkpzmKVTE5DxYSDnIDgIjLM8Iy7IkpjS++Egf6F8r5PpgG6vk5LJCC6i8w3caXiukE0Wbpq4xr5sEM01SnNdaYilIpmvGspqYCl1Uf/TmsSROYhwLTEhE6IImC5pd8oRU6A1atWnt0Yyns94w3Wglx9GacZ5dlp/KaNPXtrXhNHN3TgECF4ZnN1/zW7M527yXY/ATOPP6YN3HKhX6TMBkDsHxjM08w2iVuXPbYg14fBnHnDIo+85Pn+I8U47SeakmDtmexdUknhIyE/RHq834YPzQO38eeXcS7aWPamNcJJUyQzA6qk/RvN3Mo19M25aQ0mb2m5F/a1sXbLs2R3C4VM/QkcExGZnygljDwc9axXa1gj8FckRvT2+/AX57S5FKAwAA' } }
-// let buff = new Buffer.from(data, 'base64');
-// const logevents = JSON.parse(zlib.unzipSync(buff).toString())
-// will turn into object that looks like
-// {
-//   messageType: 'DATA_MESSAGE',
-//   owner: '619887618095',
-//   logGroup: 'sns/us-east-1/619887618095/DirectPublishToPhoneNumber',
-//   logStream: '5d3b40ed-11d4-4cf4-9212-907f2af79295',
-//   subscriptionFilters: [
-//     'gameattendanttasks-dev-FailedSmsLogsSubscriptionFilterCloudWatchLog1-Y4V8FV708U42'
-//   ],
-//   logEvents: [
-//     {
-//       id: '35617103049281018062579949611669365811856796239944155136',
-//       timestamp: 1597126137813,
-//       message: '{"notification":{"messageId":"0486ea62-245b-5bc2-842c-bdce11872257","timestamp":"2020-08-11 05:58:52.488"},"delivery":{"phoneCarrier":"AT&T Mobility","mnc":180,"numberOfMessageParts":1,"destination":"+18179398675","priceInUSD":0.00645,"smsType":"Transactional","mcc":311,"providerResponse":"Message has been accepted by phone","dwellTimeMs":200,"dwellTimeMsUntilDeviceAck":602876},"status":"SUCCESS"}'
-//     }
-//   ]
-// }
-
 const validSuccessEvent = {
   awslogs: {
     data: `eJxlU9Fq2zAU/ZWgh72saiXZkuW8haQthWUrtdMxljJk+SYRteVgKSmh9N937bRsY+AH+9x7zzn3SH4lLYRgtlCe9kCmZDErZ7+W10Uxu70mF6R78dAjrHiudaa4ZrlEuOm2t3132GMl+HB1CBRMiJRf/d13tXA92Hh/
@@ -54,6 +30,14 @@ const validFailedEvent2 = {
       'H4sIAAAAAAAAAGVSXW/bMAz8K4Ee9rKqkWRbH3kLmqQI0GxFna4YlmKQbToRasuBJKcIiv73yc6KbdgbxSPvTiTfUAve6z1sz0dAM7SYb+c/N8s8n98u0RXqXi24mOZUSSk4lURlMd10+1vX9ceIeOunvcegfcB0+nfddGEclOG+LxrjD9vu/tBZ+NK3BbjpSpumd3ChyoMD3UYuCYrVMuVYCSZwKkBgmUKKq6yoi1pkVMOg7vvCl84cg+nsyjQBnEezH2ivW9AhgK20DUH7F48rOOFBCqq89Xfd3uf/td40XV896VAeIs4wvVvL7+tv+eZ29fSEnkd/yxPYMEi8IVNFm0nGM8YzlSlBEx6jlAnK0pQomQwYl1yRhFAuqWQkyRKVJUIxEq0HE8cddBsnRzMlBSNZKjPOrj7WEOnfdsh2wdSm1IPNHZrFzG94XcXnDkVeUSc6xWWiAWdVkeJCVTXWKSdpXUfJMhZe7f7ojW2MMIKJxExNqJgRNmP0OuFih95jaQWNOYE7X/SOw7JutHMG3Ng7337aTjZdYRoTziN3a8uIxFXH2I5r/VpvLjbvtQt+AEdeH4z9+MoOfaaSCpUoyUU28hydKWFtH/NFxMk1ITzNYtq3frjJsWfrtPW6HDh0cxEvB/GE0pGgO5kK3AP4Y2f9pWW8tonxk7J3Lu6vOU96G++sPOiigWlv9SkexhCPfNUrNM02Tmsz+GaE/5t7tME0CzhFp/PyZfgZJckwtTjc0PtRcTVf3z0+LOM00fvz+y8E1gJ2WQMAAA==',
   },
 };
+
+const validFailedEvent3 = {
+  awslogs: {
+    data:
+      'H4sIAAAAAAAAAGVSXW/bIBT9KxEPe1lpwBgDeYuapIrUbFXtrpqWasJAE1QbR4BTRVH/+7Czapv2BvdwPrj3nkFrQpA7U50OBszAYl7Nf26WZTm/XYIr0L0541O5wIJzVmCOBE3lptvd+q4/JCS4MO0DNDJEiKd/v5surDcq3vd1Y8O+6u73nTNf+rY2frqStum9uUiV0RvZJi2aYSQEQxBLxGGOJYMC0QzWkmulqOaSkkQJfR2Ut4doO7eyTTQ+gNkPsJOtkTEap6WLUYbXALU5wsHK6LINd90ulP9Rb5qu108yqn3CM4jv1vz7+lu5uV09PYHnMd/yaFwcLM7A6hST0ILnOU5JOS0yQikuBBMCMZEThlHOC0w4JpSxgjEk8ixjHOW4SNGjTe2Osk2dwwVCOM8ZISTDVx9jSPLnLXBdtC9WySHmFsxS5Te81um6BfiFGCMVgURpBCnBHAqqc1hrLFhNuTaGbMHV9o/fSMtQhiASENMJymeEz0h2XfD08j091aaxR+NPF7/DMKwb6b01fuTOq0/VZNPVtrHxNGq3TiUkjTqd3TjWry+bS8x76WMYwFE3ROs+vrIFnzHHTBDBC0ZHnYO3yqzdY7lIOLpGqMhpKoc2DDs5ciovXZBq0JDNxVwN5gTjUaA7Wm38gwmHzoULZdy2iQ0T1Xuf5tecJr1Le6b2sm7MtHfymBZjOI96+s00TZW6tRlyZ5j+W3t00TYLc0xJ5+p1+BliZOhaam7sw+i4mq/vHh+WqZvg/fn9F4ohmnZZAwAA',
+  },
+};
+
 const validSuccessEventMsgs = [
   {
     notification: {
@@ -115,61 +99,11 @@ jest.mock('aws-sdk', () => {
 });
 
 describe('smsLogs', () => {
-  const validInput = {
-    teamInfo: { teamName: 'testing2s', dateTime: '7/30/2020, 3:44:31 PM', teamId: 'VyXY1ikPw', gameId: 'gameId' },
-    players: [
-      {
-        phoneNumber: '8179391234',
-        playerId: 'ZV0xu8M1p',
-        snsMessageId: 'e1f08614-3a0e-5843-a715-d1bb488aafe9',
-      },
-    ],
-    statusType: 0,
-    retries: 0,
-  };
-  const validInput2 = {
-    teamInfo: { teamName: 'testing2s', dateTime: '7/30/2020, 3:44:31 PM', teamId: 'VyXY1ikPw', gameId: 'gameId' },
-    players: [
-      {
-        phoneNumber: '8179391234',
-        playerId: 'ZV0xu8M1p',
-        snsMessageId: '0486ea62-245b-5bc2-842c-bdce11872257',
-      },
-    ],
-    statusType: 0,
-    retries: 0,
-  };
-
-  const validSaved = {
-    statusType: 0,
-    snsMessageId: '1827f3a4-c3ae-5db4-b9df-a4604ff353cd',
-    retries: 0,
-    players: [
-      { phoneNumber: '8179398675', playerId: '_6tVhnSou', snsMessageId: '1827f3a4-c3ae-5db4-b9df-a4604ff353cd' },
-    ],
-    teamInfo: { teamName: 'A', dateTime: '8/29/2020, 12:02:17 PM', gameId: 'H6BeDba5K', teamId: '9hie_SVJi' },
-  };
-  const maxTries = {
-    teamInfo: { teamName: 'testing2s', dateTime: '7/30/2020, 3:44:31 PM', teamId: 'VyXY1ikPw', gameId: 'gameId' },
-    players: [
-      {
-        phoneNumber: '8179391234',
-        playerId: 'ZV0xu8M1p',
-        snsMessageId: 'e1f08614-3a0e-5843-a715-d1bb488aafe9',
-      },
-    ],
-    statusType: 0,
-    retries: 3,
-  };
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   describe('given a valid base64 zip', () => {
-    beforeAll(async () => {
-      await snsEventSave(validInput2);
-    });
     test('it decodes and returns logEvent messages array', async () => {
       const actual = await failedSms(validSuccessEvent);
       expect(actual).toEqual(validSuccessEventMsgs);
@@ -180,7 +114,6 @@ describe('smsLogs', () => {
       expect(actual.Items[0].players['ZV0xu8M1p'].smsDelivered).toBe('success');
     });
     test('it should resent and update send count for event if status is FAILURE', async () => {
-      await snsEventSave(validInput);
       const actual = await failedSms(validFailedEvent);
       const newSaved = await snsEventQuery('da5a27f3-a831-5158-8594-70f62df89f77');
       expect(actual).toEqual(validFailedEventMsgs);
@@ -190,17 +123,17 @@ describe('smsLogs', () => {
           {
             player: {
               phoneNumber: '8179391234',
-              playerId: 'ZV0xu8M1p',
+              id: 'ZV0xu8M1p',
               snsMessageId: 'da5a27f3-a831-5158-8594-70f62df89f77',
             },
             retries: 1,
             snsMessageId: 'da5a27f3-a831-5158-8594-70f62df89f77',
             statusType: 0,
             teamInfo: {
-              dateTime: '7/30/2020, 3:44:31 PM',
-              gameId: 'gameId',
-              teamId: 'VyXY1ikPw',
               teamName: 'testing2s',
+              dateTime: '7/30/2020, 3:44:31 PM',
+              teamId: 'VyXY1ikPw',
+              gameId: 'gameId',
             },
           },
         ],
@@ -208,19 +141,21 @@ describe('smsLogs', () => {
       });
     });
     test('it should not send on FAILURE if after 3rd try', async () => {
-      await snsEventSave(maxTries);
-      const actual = await failedSms(validFailedEvent);
+      const actual = await failedSms(validFailedEvent3);
       expect(actual).toBe('max retries reach');
     });
+    test('it update tableGameAttendants with failed after 3rd try', async () => {
+      await failedSms(validFailedEvent3);
+      const actual = await searchStatusRecord('teamIdFor3rdFailedTest', 'gameIdFor3rdFailedTest');
+      expect(actual.Items[0].players['playerIdFor3rdFailedTest'].smsDelivered).toBe('failed');
+    });
     test('it should send correct and update send count for event if status is FAILURE', async () => {
-      await snsEventSave(validSaved);
-      const actual = await failedSms(validFailedEvent2);
-      const newSaved = await snsEventQuery('da5a27f3-a831-5158-8594-70f62df89f77');
+      await failedSms(validFailedEvent2);
       expect(sns.publish.mock.calls[0]).toHaveLength(1);
       expect(sns.publish.mock.calls[0][0]).toEqual({
         Message:
-          'Confirm your status for A game at 8/29/2020, 12:02:17 PM: https://teamstatus-dev.wvandolah.com/statusUpdate?t=9hie_SVJi&g=H6BeDba5K&p=undefined',
-        PhoneNumber: '+18179398675',
+          'Confirm your status for A game at 8/29/2020, 2:36:31 PM: https://teamstatus-dev.wvandolah.com/statusUpdate?t=9hie_SVJi&g=7rQx-4ogw&p=_6tVhnSou',
+        PhoneNumber: '+18178178171',
       });
     });
   });

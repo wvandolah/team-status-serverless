@@ -1,9 +1,4 @@
-const {
-  searchStatus,
-  searchStatuses,
-  deleteStatus,
-  updatePlayerStatus,
-} = require('../../src/controller/status');
+const { searchStatus, searchStatuses, deleteStatus, updatePlayerStatus } = require('../../src/controller/status');
 const {
   searchStatusRecord,
   deleteStatusRecord,

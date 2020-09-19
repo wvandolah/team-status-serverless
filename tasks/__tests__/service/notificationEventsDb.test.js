@@ -8,11 +8,11 @@ describe('notificationEventsDB', () => {
         teamId: 'teamId',
         players: [
           {
-            playerId: 'playerId1',
+            id: 'playerId1',
             snsMessageId: 'snsMessageId1',
           },
           {
-            playerId: 'playerId2',
+            id: 'playerId2',
             snsMessageId: 'snsMessageId2',
           },
         ],
@@ -29,11 +29,11 @@ describe('notificationEventsDB', () => {
       teamId: 'teamId',
       players: [
         {
-          playerId: 'playerId1',
+          id: 'playerId1',
           snsMessageId: 'querySnsId1',
         },
         {
-          playerId: 'playerId2',
+          id: 'playerId2',
           snsMessageId: 'querySnsId2',
         },
       ],
@@ -43,7 +43,7 @@ describe('notificationEventsDB', () => {
       players: [
         {
           phoneNumber: '8179391234',
-          playerId: 'ZV0xu8M1p',
+          id: 'ZV0xu8M1p',
           snsMessageId: 'querySnsId1',
         },
       ],
@@ -56,7 +56,7 @@ describe('notificationEventsDB', () => {
         teamInfo: { teamName: 'testing2s', dateTime: '7/30/2020, 3:44:31 PM', teamId: 'VyXY1ikPw', gameId: 'gameId' },
         player: {
           phoneNumber: '8179391234',
-          playerId: 'ZV0xu8M1p',
+          id: 'ZV0xu8M1p',
           snsMessageId: 'querySnsId1',
         },
         statusType: 0,
@@ -66,7 +66,7 @@ describe('notificationEventsDB', () => {
       {
         gameId: 'gameId',
         teamId: 'teamId',
-        playerId: 'playerId2',
+        id: 'playerId2',
         snsMessageId: 'querySnsId2',
       },
     ];

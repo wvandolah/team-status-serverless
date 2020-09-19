@@ -4,6 +4,12 @@ const { snsEventQuery, snsEventSave } = require('../service/notificationEventsDb
 const { updateSmsDeliveryStatus } = require('../service/statusDB');
 const { sendMsg } = require('../service/sendNotification');
 const { smsDeliveryTypes } = require('../helper');
+
+const setSmsDeliveryData = (item) => {
+  const { teamId, gameId } = item[0].teamInfo;
+  const { id } = item[0].player;
+  return { teamId, gameId, id };
+};
 module.exports.failedSms = async (event) => {
   const { data } = event.awslogs;
   try {
@@ -22,20 +28,22 @@ module.exports.failedSms = async (event) => {
     }
     if (logEvents[0].status === 'SUCCESS') {
       console.log('[smsLogs]: successful: ', logEvents[0].notification.messageId);
-      const { teamId, gameId } = Items[0].teamInfo;
-      const { playerId } = Items[0].player;
-      await updateSmsDeliveryStatus(teamId, gameId, playerId, smsDeliveryTypes.SUCCESS);
+      const { teamId, gameId, id } = setSmsDeliveryData(Items);
+      await updateSmsDeliveryStatus(teamId, gameId, id, smsDeliveryTypes.SUCCESS);
       return logEvents;
     }
 
     if (Items[0].retries >= 3) {
       console.log('[smsLogs]: max retries reach: ', logEvents[0].notification.messageId, Items[0]);
+      const { teamId, gameId, id } = setSmsDeliveryData(Items);
+      await updateSmsDeliveryStatus(teamId, gameId, id, smsDeliveryTypes.FAIL);
       return 'max retries reach';
     }
 
     const newSnsId = await sendMsg(Items[0].statusType, Items[0].teamInfo, Items[0].player);
     const result = {
-      ...Items[0],
+      statusType: Items[0].statusType,
+      teamInfo: Items[0].teamInfo,
       players: [{ ...Items[0].player, snsMessageId: newSnsId.MessageId }],
       retries: Items[0].retries + 1,
     };
