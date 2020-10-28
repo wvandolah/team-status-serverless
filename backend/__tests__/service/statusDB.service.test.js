@@ -141,11 +141,19 @@ describe('statusDB.service', () => {
       return deleteStatusRecord(saveTeam);
     });
     test('should update status when given status', async () => {
-      const updatePlayerStatusParams = { ...updatePlayerBaseParams, status: 'in' };
+      const updatePlayerStatusParams = { ...updatePlayerBaseParams, updateField: 'status', updateValue: 'In' };
       const actual = await updatePlayerStatusRecord(updatePlayerStatusParams);
-      expect(actual.Attributes.players[updatePlayerStatusParams.playerId].status).toEqual(
-        updatePlayerStatusParams.status,
-      );
+
+      expect(actual.Attributes.players[updatePlayerStatusParams.playerId].status).toEqual('In');
+    });
+    test('should update smsDelivered when given smsDelivered', async () => {
+      const updatePlayerStatusParams = {
+        ...updatePlayerBaseParams,
+        updateField: 'smsDelivered',
+        updateValue: 'success',
+      };
+      const actual = await updatePlayerStatusRecord(updatePlayerStatusParams);
+      expect(actual.Attributes.players[updatePlayerStatusParams.playerId].smsDelivered).toEqual('success');
     });
   });
 });

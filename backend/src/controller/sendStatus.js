@@ -43,6 +43,13 @@ module.exports.resendStatusRequest = async (event) => {
       await sendNotifications(data, sendStatusTypes.NEW_GAME);
       const { sesReturn } = sendStatusEmail(data.players, data, data.gameId);
       await sesReturn;
+      await updatePlayerStatusRecord({
+        teamId: data.teamId,
+        gameId: data.gameId,
+        playerId: data.players[0].id,
+        updateField: 'smsDelivered',
+        updateValue: '',
+      });
       const result = buildResults(data);
       response = { result };
     } else {
