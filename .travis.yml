@@ -49,7 +49,7 @@ deployService: &DEPLOY_SERVICE
   script:
     - cd ${SERVICE_PATH}
     - serverless config credentials --provider aws --key $AWS_ACCESS_KEY_ID --secret $AWS_SECRET_ACCESS_KEY
-    - travis_retry serverless deploy
+    - travis_retry serverless deploy --stage ${DEPLOY_TO}
     - cd -
   workspaces:
     use: common
@@ -60,10 +60,30 @@ jobs:
       <<: *TEST_SERVICE
       name: "Test"
     - stage: deploy
+      if: branch = dev
       <<: *DEPLOY_SERVICE
       name: "Deploy backend to AWS DEV"
-      env: SERVICE_PATH="backend"
+      env: 
+        - SERVICE_PATH="backend"
+        - DEPLOY_TO="dev"
     - stage: deploy
+      if: branch = dev
       <<: *DEPLOY_SERVICE
       name: "Deploy tasks to AWS DEV"
-      env: SERVICE_PATH="tasks"
+      env: 
+        - SERVICE_PATH="tasks"
+        - DEPLOY_TO="dev"
+    - stage: deploy
+      if: branch = master
+      <<: *DEPLOY_SERVICE
+      name: "Deploy backend to AWS PROD"
+      env: 
+        - SERVICE_PATH="backend"
+        - DEPLOY_TO="prod"
+    - stage: deploy
+      if: branch = master
+      <<: *DEPLOY_SERVICE
+      name: "Deploy tasks to AWS PROD"
+      env: 
+        - SERVICE_PATH="tasks"
+        - DEPLOY_TO="prod"
