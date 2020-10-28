@@ -52,7 +52,7 @@ module.exports.failedSms = async (event) => {
 
     return logEvents;
   } catch (e) {
-    console.error('failedSms error: ', e, e.message);
+    console.error('[smsLogs]: ', e, e.message);
     return 'error';
   }
 };

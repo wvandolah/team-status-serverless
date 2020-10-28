@@ -3,9 +3,19 @@ service: gameattendant
 plugins:
   - serverless-dynamodb-local
   - serverless-offline
+  - serverless-domain-manager
 
 custom:
   stage: ${opt:stage, self:provider.stage}
+  domains:
+    prod: teamstatus-api.wvandolah.com
+    dev: teamstatus-api-dev.wvandolah.com
+  customDomain:
+    domainName: ${self:custom.domains.${self:custom.stage}}
+    basePath: ''
+    stage: ${self:provider.stage}
+    createRoute53Record: true
+    certificateName: 'wvandolah.com'
   serverless-offline:
     port: 4000
   tables:

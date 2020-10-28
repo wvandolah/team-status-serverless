@@ -75,6 +75,7 @@ functions:
   failedSms:
     handler: src/controller/smsLogs.failedSms
     environment:
+      tableGameAttendants: ${self:custom.tables.gameAttendants.name}
       tableNotificationEvents: ${self:custom.tables.notificationEvents.name}
       baseUrl: https://teamstatus<stage>.wvandolah.com
     events:
