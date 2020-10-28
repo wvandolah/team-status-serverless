@@ -66,13 +66,13 @@ module.exports = {
   },
 
   updatePlayerStatusRecord: (updateParams) => {
-    const { teamId, gameId, playerId, status, snsMessageId } = updateParams;
+    const { teamId, gameId, playerId, updateField, updateValue } = updateParams;
     const key = {
       teamId: teamId,
       gameId: gameId,
     };
-    const attributeToUpdate = status ? 'status' : 'snsMessageId';
-    const attributeValueToUpdate = status ? status : snsMessageId;
+    const attributeToUpdate = updateField;
+    const attributeValueToUpdate = updateValue;
     const expressionAttNames = {
       '#pl': 'players',
       '#plToUpdate': playerId,

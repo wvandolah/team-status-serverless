@@ -20,6 +20,9 @@ module.exports = {
       keyString += ' and teamId = :teamId';
       expressionAttObj[':teamId'] = teamId;
     }
+    if (!userId) {
+      throw new Error('User information not provided');
+    }
     const params = {
       TableName: process.env.tableTeamPlayers,
       KeyConditionExpression: keyString,

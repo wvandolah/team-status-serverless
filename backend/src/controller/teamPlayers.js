@@ -21,7 +21,9 @@ const {
   * 
  */
 module.exports.create = async (event) => {
-  let { data, response, statusCode } = parseEvent(event);
+  const { data } = parseEvent(event);
+  let response = {};
+  let statusCode = 201;
   try {
     if ('userId' in data && 'teamId' in data && 'players' in data && data.players.length > 0) {
       const record = {
@@ -30,7 +32,6 @@ module.exports.create = async (event) => {
         players: data.players,
         teamName: data.teamName,
       };
-      statusCode = 201;
       await createTeamPlayerRecord(record);
       response = record;
     } else {
@@ -50,10 +51,11 @@ module.exports.create = async (event) => {
 };
 
 module.exports.search = async (event) => {
-  let { queryParams, response, statusCode } = parseEvent(event);
+  let { queryParams } = parseEvent(event);
+  let response = {};
+  let statusCode = 200;
   try {
     if (queryParams && 'userId' in queryParams) {
-      statusCode = 200;
       response = await searchTeamPlayerRecord(queryParams);
     } else {
       statusCode = 400;
@@ -71,11 +73,12 @@ module.exports.search = async (event) => {
   return setResponse(statusCode, response, queryParams);
 };
 
-module.exports.delete = async (event) => {
-  let { queryParams, response, statusCode } = parseEvent(event);
+module.exports.deleteTeamPlayer = async (event) => {
+  let { queryParams } = parseEvent(event);
+  let response = {};
+  let statusCode = 200;
   try {
     if ('userId' in queryParams && 'teamId' in queryParams) {
-      statusCode = 200;
       response = await deleteTeamPlayerRecord(queryParams);
     } else {
       statusCode = 400;

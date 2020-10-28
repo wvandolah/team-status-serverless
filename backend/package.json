@@ -1,0 +1,29 @@
+{
+  "name": "game-attendants",
+  "version": "1.0.0",
+  "description": "\"send notifications to user about upcoming games\"",
+  "repository": "",
+  "author": "William VanDolah <william.vandolah@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "local": "serverless offline start",
+    "test": "jest",
+    "testCoverage": "jest --coverage"
+  },
+  "devDependencies": {
+    "@shelf/jest-dynamodb": "^1.7.0",
+    "aws-sdk": "^2.729.0",
+    "jest": "^26.2.2",
+    "mock-jwks": "^0.3.0",
+    "nock": "^13.0.2",
+    "serverless": "^1.78.1",
+    "serverless-domain-manager": "^5.0.0",
+    "serverless-dynamodb-local": "^0.2.39",
+    "serverless-offline": "^5.12.1"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1",
+    "jwks-rsa": "^1.8.0",
+    "shortid": "^2.2.15"
+  }
+}

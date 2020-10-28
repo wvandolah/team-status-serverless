@@ -1,0 +1,98 @@
+service: gameattendanttasks
+
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  serverless-offline:
+    port: 4000
+  tables:
+    gameAttendants: 
+      name: "game-attendants-${self:custom.stage}"
+      hash: "teamId"
+      range: "gameId"
+    teamPlayers: 
+      name: "team-player-${self:custom.stage}"
+      hash: "userId"
+      range: "teamId"
+    notificationEvents:
+      name: "notification-events-${self:custom.stage}"
+      hash: "snsMessageId"
+  topics:
+    sendNotificationTopic: "${self:service}-${self:custom.stage}-send-notification-topic"
+  watchedLogGroups:
+    successSms: "sns/${opt:region, self:provider.region}/619887618095/DirectPublishToPhoneNumber"
+    failedSms: "sns/${opt:region, self:provider.region}/619887618095/DirectPublishToPhoneNumber/Failure"
+  dynamodb:
+    stages:
+      - ${self:provider.stage}
+    start:
+      inMemory: true
+      migrate: true
+      stage: ${opt:stage, 'dev'}
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.tables.gameAttendants.name}"
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:BatchWriteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.tables.notificationEvents.name}"
+    - Effect: Deny
+      Action:
+        - SNS:Publish
+      Resource: "arn:aws:sns:*:*:*"
+    - Effect: Allow
+      Action:
+        - SNS:Publish
+      Resource: "*"
+
+functions:
+  sendSms:
+    handler: src/controller/sendNotification.sendSms
+    environment:
+      tableGameAttendants: ${self:custom.tables.gameAttendants.name}
+      tableNotificationEvents: ${self:custom.tables.notificationEvents.name}
+      env: ${self:custom.stage}
+      baseUrl: https://teamstatus<stage>.wvandolah.com
+    events:
+      - sns: ${self:custom.topics.sendNotificationTopic}
+  failedSms:
+    handler: src/controller/smsLogs.failedSms
+    environment:
+      tableGameAttendants: ${self:custom.tables.gameAttendants.name}
+      tableNotificationEvents: ${self:custom.tables.notificationEvents.name}
+      baseUrl: https://teamstatus<stage>.wvandolah.com
+    events:
+      - cloudwatchLog: ${self:custom.watchedLogGroups.successSms}
+      - cloudwatchLog: ${self:custom.watchedLogGroups.failedSms}
+
+resources:
+  Resources:
+    gameAttendants:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tables.notificationEvents.name}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: ${self:custom.tables.notificationEvents.hash}
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ${self:custom.tables.notificationEvents.hash}
+            KeyType: HASH
+

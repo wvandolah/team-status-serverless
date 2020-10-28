@@ -1,14 +1,21 @@
 service: gameattendant
-# app and org for use with dashboard.serverless.com
-app: game-attendant
-org: wvandolah
 
 plugins:
   - serverless-dynamodb-local
   - serverless-offline
+  - serverless-domain-manager
 
 custom:
   stage: ${opt:stage, self:provider.stage}
+  domains:
+    prod: teamstatus-api.wvandolah.com
+    dev: teamstatus-api-dev.wvandolah.com
+  customDomain:
+    domainName: ${self:custom.domains.${self:custom.stage}}
+    basePath: ''
+    stage: ${self:provider.stage}
+    createRoute53Record: true
+    certificateName: 'wvandolah.com'
   serverless-offline:
     port: 4000
   tables:
@@ -25,7 +32,8 @@ custom:
       inMemory: true
       migrate: true
       stage: ${opt:stage, 'dev'}
-
+  topic: 
+    sendNotificationTopic: "gameattendanttasks-${self:custom.stage}-send-notification-topic"
 provider:
   name: aws
   runtime: nodejs10.x
@@ -48,18 +56,23 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.tables.teamPlayers}"
+    - Effect: Allow
+      Action:
+        - SNS:Publish
+      Resource: { "Fn::Join" : [":", ["arn:aws:sns:${opt:region, self:provider.region}", { "Ref" : "AWS::AccountId" }, "${self:custom.topic.sendNotificationTopic}" ] ]  }
 
 functions:
   authFn:
-    handler: src/service/authFn.service.authFn
+    handler: src/service/authFn.authFn
     environment:
       jwksUri: ${self:custom.Auth0.jwksUri}
       audience: ${self:custom.Auth0.audience}
       issuer: ${self:custom.Auth0.issuer}
   sendStatusRequest:
-    handler: src/controller/sendStatus.controller.sendStatusRequest
+    handler: src/controller/sendStatus.sendStatusRequest
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
+      sendNotificationTopicArn: { "Fn::Join" : [":", ["arn:aws:sns:${opt:region, self:provider.region}", { "Ref" : "AWS::AccountId" }, "${self:custom.topic.sendNotificationTopic}" ] ]  }
     events:
       - http:
           path: status
@@ -67,9 +80,10 @@ functions:
           cors: true
           authorizer: authFn
   resendStatusRequest:
-    handler: src/controller/sendStatus.controller.resendStatusRequest
+    handler: src/controller/sendStatus.resendStatusRequest
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
+      sendNotificationTopicArn: { "Fn::Join" : [":", ["arn:aws:sns:${opt:region, self:provider.region}", { "Ref" : "AWS::AccountId" }, "${self:custom.topic.sendNotificationTopic}" ] ]  }
     events:
       - http:
           path: resend
@@ -77,7 +91,7 @@ functions:
           cors: true
           authorizer: authFn
   searchStatusRequest:
-    handler: src/controller/status.controller.searchStatuses
+    handler: src/controller/status.searchStatuses
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
     events:
@@ -87,9 +101,10 @@ functions:
           cors: true
           authorizer: authFn
   deleteStatusRequest:
-    handler: src/controller/status.controller.deleteStatus
+    handler: src/controller/status.deleteStatus
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
+      sendNotificationTopicArn: { "Fn::Join" : [":", ["arn:aws:sns:${opt:region, self:provider.region}", { "Ref" : "AWS::AccountId" }, "${self:custom.topic.sendNotificationTopic}" ] ]  }
     events:
       - http:
           path: status
@@ -97,7 +112,7 @@ functions:
           cors: true
           authorizer: authFn
   updatePlayerStatusRequest:
-    handler: src/controller/status.controller.updatePlayerStatus
+    handler: src/controller/status.updatePlayerStatus
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
     events:
@@ -106,7 +121,7 @@ functions:
           method: put
           cors: true
   searchPlayerStatusRequest:
-    handler: src/controller/status.controller.searchStatus
+    handler: src/controller/status.searchStatus
     environment:
       tableGameAttendants: ${self:custom.tables.gameAttendants}
     events:
@@ -115,7 +130,7 @@ functions:
           method: get
           cors: true
   createTeamPlayerRequest:
-    handler: src/controller/teamPlayers.controller.create
+    handler: src/controller/teamPlayers.create
     environment:
       tableTeamPlayers: ${self:custom.tables.teamPlayers}
     events:
@@ -125,7 +140,7 @@ functions:
           cors: true
           authorizer: authFn
   searchTeamPlayerRequest:
-    handler: src/controller/teamPlayers.controller.search
+    handler: src/controller/teamPlayers.search
     environment:
       tableTeamPlayers: ${self:custom.tables.teamPlayers}
     events:
@@ -135,7 +150,7 @@ functions:
           cors: true
           authorizer: authFn
   deleteTeamPlayerRequest:
-    handler: src/controller/teamPlayers.controller.delete
+    handler: src/controller/teamPlayers.deleteTeamPlayer
     environment:
       tableTeamPlayers: ${self:custom.tables.teamPlayers}
     events:

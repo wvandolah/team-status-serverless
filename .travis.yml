@@ -1,22 +1,69 @@
 language: node_js
 
-cache:
-  directories:
-    - node_modules
-
+stages:
+  - test
+  - name: deployDev
+    if: branch = dev
+git:
+  depth: false
+  
 notifications:
   email: false
 
 node_js:
   - 10
 
-install:
-  - npm i
 
 addons:
   sonarcloud:
     organization: "wvandolah" # the key of the org you chose at step #3
 
-script:
-  - npm run testCoverage
-  - sonar-scanner
+
+testService: &TEST_SERVICE
+  install:
+    - ls
+    - cd backend
+    - travis_retry npm install
+    - cd -
+    - cd tasks
+    - travis_retry npm install
+    - cd -
+
+  script:
+    - cd backend
+    - npm run testCoverage
+    - cd -
+    - cd tasks
+    - npm run testCoverage
+    - cd -
+    - sonar-scanner
+  workspaces:
+    create:
+      name: common
+      paths: ./
+
+deployService: &DEPLOY_SERVICE
+  install:
+    npm install -g serverless
+  
+  script:
+    - cd ${SERVICE_PATH}
+    - serverless config credentials --provider aws --key $AWS_ACCESS_KEY_ID --secret $AWS_SECRET_ACCESS_KEY
+    - travis_retry serverless deploy
+    - cd -
+  workspaces:
+    use: common
+
+jobs:
+  include:
+    - stage: test
+      <<: *TEST_SERVICE
+      name: "Test"
+    - stage: deploy
+      <<: *DEPLOY_SERVICE
+      name: "Deploy backend to AWS DEV"
+      env: SERVICE_PATH="backend"
+    - stage: deploy
+      <<: *DEPLOY_SERVICE
+      name: "Deploy tasks to AWS DEV"
+      env: SERVICE_PATH="tasks"

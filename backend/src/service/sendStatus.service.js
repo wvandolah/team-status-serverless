@@ -1,38 +1,24 @@
 'use strict';
 
-const AWS = require('aws-sdk');
-const SNS = new AWS.SNS({ apiVersion: '2010-03-31', SMS: { smsType: 'Transactional' } });
-const ses = new AWS.SES({ apiVersion: '2010-12-01' });
-
-const sendSMS = (message, phoneNumber) => {
-  const smsData = {
-    Message: message,
-    PhoneNumber: `+1${phoneNumber}`,
-  };
-  // Sending sms costs $0.0065/msg
-  if (process.env.IS_OFFLINE) {
-    console.warn(smsData);
-    const mockResponse = {
-      ResponseMetadata: {
-        RequestId: message,
-      },
-      MessageId: 'da5a27f3-a831-5158-8594-70f62df89f77',
-    };
-    return new Promise((resolve) => resolve(mockResponse));
-  }
-
-  return SNS.publish(smsData).promise();
-};
+const { SNS, SES } = require('aws-sdk');
+const sns = new SNS({ apiVersion: '2010-03-31' });
+const ses = new SES({ apiVersion: '2010-12-01' });
 
 module.exports = {
-  sendStatusSMS: (player, data, gameId) => {
-    const message = `Confirm your status for ${data.teamName} game at ${data.dateTime}: https://teamstatus.wvandolah.com/statusUpdate?t=${data.teamId}&g=${gameId}&p=${player.id}`;
-    return sendSMS(message, player.phoneNumber);
-  },
-
-  sendDeleteSMS: (player, data) => {
-    const message = `${data.teamName} game at ${data.dateTime} has been canceled or rescheduled.`;
-    return sendSMS(message, player.phoneNumber);
+  sendNotifications: (data, statusType) => {
+    const payload = {
+      data,
+      statusType,
+    };
+    if (!process.env.IS_OFFLINE) {
+      console.log('sending to sendNotificationTopic', data, statusType);
+      return sns
+        .publish({
+          Message: JSON.stringify(payload),
+          TopicArn: process.env.sendNotificationTopicArn,
+        })
+        .promise();
+    }
   },
 
   sendDeleteEmail: (players, data) => {
@@ -44,7 +30,7 @@ module.exports = {
       DefaultTemplateData:
         '{ "teamName":"<null>", "opponentName": "<null>",  "dateTime": "<null>", "firstName":"<null>" }',
     };
-    const sentEmails = [];
+
     players.forEach((player) => {
       if (player.sendEmail) {
         const playerParams = {
@@ -54,11 +40,9 @@ module.exports = {
           ReplacementTemplateData: `{ "teamName":"${data.teamName}", "opponentName":"${data.opponentName}",  "dateTime": "${data.dateTime}", "firstName":"${player.firstName}"}`,
         };
         params.Destinations.push(playerParams);
-        sentEmails.push(player);
       }
     });
-    const sesReturn = params.Destinations.length > 0 ? ses.sendBulkTemplatedEmail(params).promise() : {};
-    return sesReturn;
+    return params.Destinations.length > 0 ? ses.sendBulkTemplatedEmail(params).promise() : {};
   },
 
   sendStatusEmail: (players, data, gameId) => {

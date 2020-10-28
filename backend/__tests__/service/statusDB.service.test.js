@@ -3,7 +3,7 @@ const {
   searchStatusRecord,
   deleteStatusRecord,
   updatePlayerStatusRecord,
-} = require('../src/service/statusDB.service');
+} = require('../../src/service/statusDB.service');
 
 const testTeams = [
   {
@@ -141,23 +141,19 @@ describe('statusDB.service', () => {
       return deleteStatusRecord(saveTeam);
     });
     test('should update status when given status', async () => {
-      const updatePlayerStatusParams = { ...updatePlayerBaseParams, status: 'in' };
+      const updatePlayerStatusParams = { ...updatePlayerBaseParams, updateField: 'status', updateValue: 'In' };
       const actual = await updatePlayerStatusRecord(updatePlayerStatusParams);
-      expect(actual.Attributes.players[updatePlayerStatusParams.playerId].status).toEqual(
-        updatePlayerStatusParams.status,
-      );
+
+      expect(actual.Attributes.players[updatePlayerStatusParams.playerId].status).toEqual('In');
     });
-    test('should update snsId when not given status', async () => {
-      const updatePlayerStatusParams = { ...updatePlayerBaseParams, snsMessageId: 'updateStatus' };
+    test('should update smsDelivered when given smsDelivered', async () => {
+      const updatePlayerStatusParams = {
+        ...updatePlayerBaseParams,
+        updateField: 'smsDelivered',
+        updateValue: 'success',
+      };
       const actual = await updatePlayerStatusRecord(updatePlayerStatusParams);
-      expect(actual.Attributes.players[updatePlayerStatusParams.playerId].snsMessageId).toEqual(
-        updatePlayerStatusParams.snsMessageId,
-      );
-    });
-    test('should not update status when not given status', async () => {
-      const updatePlayerStatusParams = { ...updatePlayerBaseParams, snsMessageId: 'updateStatus' };
-      const actual = await updatePlayerStatusRecord(updatePlayerStatusParams);
-      expect(actual.Attributes.players[updatePlayerStatusParams.playerId].status).toEqual('startStatus');
+      expect(actual.Attributes.players[updatePlayerStatusParams.playerId].smsDelivered).toEqual('success');
     });
   });
 });
