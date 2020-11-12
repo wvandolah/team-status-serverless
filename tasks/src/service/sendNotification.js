@@ -6,9 +6,9 @@ const { sendStatusTypes } = require('../helper');
 const getMessage = (statusType, teamInfo, player) => {
   let message = '';
   const baseUrl =
-    process.env.env === 'prod'
-      ? process.env.baseUrl.replace('<stage>', '')
-      : process.env.baseUrl.replace('<stage>', `-${process.env.env}`);
+    process.env.env !== 'prod'
+      ? process.env.baseUrl.replace('<stage>', `-${process.env.env}`)
+      : process.env.baseUrl.replace('<stage>', '');
   switch (statusType) {
     case sendStatusTypes.NEW_GAME:
       message = `Confirm your status for ${teamInfo.teamName} game at ${teamInfo.dateTime}: ${baseUrl}/statusUpdate?t=${teamInfo.teamId}&g=${teamInfo.gameId}&p=${player.id}`;

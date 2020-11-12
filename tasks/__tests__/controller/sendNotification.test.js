@@ -129,15 +129,12 @@ describe('sendNotification', () => {
     });
 
     test('it should send sms to players phone number with correct message', async () => {
+      process.env.env = 'prod';
       await sendSms(expectedValidEvent);
-      const baseUrl =
-        process.env.env === 'prod'
-          ? process.env.baseUrl.replace('<stage>', '')
-          : process.env.baseUrl.replace('<stage>', `-${process.env.env}`);
       const sendPlayers = teamInfo.players
         .filter((player) => player.sendText)
         .map((player) => {
-          const message = `Confirm your status for ${teamInfo.teamName} game at ${teamInfo.dateTime}: ${baseUrl}/statusUpdate?t=${teamInfo.teamId}&g=${teamInfo.gameId}&p=${player.id}`;
+          const message = `Confirm your status for ${teamInfo.teamName} game at ${teamInfo.dateTime}: https://teamstatus.wvandolah.com/statusUpdate?t=${teamInfo.teamId}&g=${teamInfo.gameId}&p=${player.id}`;
           return [{ Message: message, PhoneNumber: `+1${player.phoneNumber}` }];
         });
       expect(sns.publish.mock.calls).toEqual(sendPlayers);
