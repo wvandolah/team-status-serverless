@@ -155,7 +155,7 @@ describe('sendNotification', () => {
         });
       expect(sns.publish.mock.calls).toEqual(sendPlayers);
     });
-    test('it should send sns, player.id, teamid, gameIds to be saved', async () => {
+    test('it should send sns, player.id, teamId, gameIds to be saved', async () => {
       await sendSms(expectedValidEvent);
       const { Items } = await snsEventQuery('da5a27f3-a831-5158-8594-70f62df89f77');
       const expected = {
