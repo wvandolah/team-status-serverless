@@ -14,16 +14,16 @@
     "@shelf/jest-dynamodb": "^1.7.0",
     "aws-sdk": "^2.729.0",
     "jest": "^26.2.2",
-    "mock-jwks": "^0.3.0",
+    "mock-jwks": "^0.3.1",
     "nock": "^13.0.2",
-    "serverless": "^1.78.1",
-    "serverless-domain-manager": "^5.0.0",
+    "serverless": "^2.20.1",
+    "serverless-domain-manager": "^5.1.0",
     "serverless-dynamodb-local": "^0.2.39",
-    "serverless-offline": "^5.12.1"
+    "serverless-offline": "^6.8.0"
   },
   "dependencies": {
     "jsonwebtoken": "^8.5.1",
-    "jwks-rsa": "^1.8.0",
+    "jwks-rsa": "^1.12.2",
     "shortid": "^2.2.15"
   }
 }
