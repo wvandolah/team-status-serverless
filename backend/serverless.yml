@@ -4,6 +4,7 @@ plugins:
   - serverless-dynamodb-local
   - serverless-offline
   - serverless-domain-manager
+  - serverless-webpack
 
 custom:
   stage: ${opt:stage, self:provider.stage}
@@ -17,7 +18,7 @@ custom:
     createRoute53Record: true
     certificateName: 'wvandolah.com'
   serverless-offline:
-    port: 4000
+    httpPort: 4000
   tables:
     gameAttendants: "game-attendants-${self:custom.stage}"
     teamPlayers: "team-player-${self:custom.stage}"
@@ -34,9 +35,13 @@ custom:
       stage: ${opt:stage, 'dev'}
   topic: 
     sendNotificationTopic: "gameattendanttasks-${self:custom.stage}-send-notification-topic"
+  webpack:
+    webpackConfig: 'webpack.config.js'   # Name of webpack configuration file
+    includeModules: true   # Node modules configuration for packaging
+    packager: 'npm'   # Packager that will be used to package your external modules
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs12.x
   iamRoleStatements:
     - Effect: Allow
       Action:

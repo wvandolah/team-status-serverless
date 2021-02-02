@@ -1,14 +1,14 @@
-'use strict';
+import { setResponse, parseEvent, sendStatusTypes } from '../helper';
+import { sendNotifications, sendStatusEmail } from '../service/sendStatus.service';
+import { createStatusRecord, updatePlayerStatusRecord } from '../service/statusDB.service';
+import * as shortid from 'shortid';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { ResponseError, Status } from '../../../common/models';
 
-const { setResponse, parseEvent, sendStatusTypes } = require('../helper');
-const { sendNotifications, sendStatusEmail } = require('../service/sendStatus.service');
-const { createStatusRecord, updatePlayerStatusRecord } = require('../service/statusDB.service');
-const shortid = require('shortid');
-
-module.exports.sendStatusRequest = async (event) => {
+export const sendStatusRequest = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const { data } = parseEvent(event);
   let statusCode = 201;
-  let response = {};
+  let response: Status | ResponseError;
   try {
     if (data.players && data.players.length > 0 && 'teamId' in data && 'dateTime' in data) {
       const gameId = shortid.generate();
@@ -18,7 +18,7 @@ module.exports.sendStatusRequest = async (event) => {
       await sesReturn;
       const result = buildResults({ ...data, gameId: gameId });
       await createStatusRecord(result);
-      response = { result };
+      response = { ...result };
     } else {
       statusCode = 400;
       response = {
@@ -26,15 +26,14 @@ module.exports.sendStatusRequest = async (event) => {
       };
     }
   } catch (err) {
-    console.log(err);
     console.warn(JSON.stringify(err));
     statusCode = 500;
-    response.error = err;
+    response = { error: err.message };
   }
   return setResponse(statusCode, response, data);
 };
 
-module.exports.resendStatusRequest = async (event) => {
+export const resendStatusRequest = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const { data } = parseEvent(event);
   let statusCode = 201;
   let response = {};
@@ -61,7 +60,7 @@ module.exports.resendStatusRequest = async (event) => {
   } catch (err) {
     console.warn(JSON.stringify(err));
     statusCode = 500;
-    response.error = err;
+    response = { error: err.message };
   }
 
   return setResponse(statusCode, response, data);

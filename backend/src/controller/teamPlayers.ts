@@ -1,10 +1,6 @@
-'use strict';
-const { setResponse, parseEvent } = require('../helper');
-const {
-  createTeamPlayerRecord,
-  searchTeamPlayerRecord,
-  deleteTeamPlayerRecord,
-} = require('../service/teamPlayers.service');
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { setResponse, parseEvent } from '../helper';
+import { createTeamPlayerRecord, searchTeamPlayerRecord, deleteTeamPlayerRecord } from '../service/teamPlayers.service';
 
 /**
  * Expected struct.  
@@ -20,7 +16,7 @@ const {
     }
   * 
  */
-module.exports.create = async (event) => {
+export const create = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const { data } = parseEvent(event);
   let response = {};
   let statusCode = 201;
@@ -50,8 +46,8 @@ module.exports.create = async (event) => {
   return setResponse(statusCode, response, data);
 };
 
-module.exports.search = async (event) => {
-  let { queryParams } = parseEvent(event);
+export const search = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  const { queryParams } = parseEvent(event);
   let response = {};
   let statusCode = 200;
   try {
@@ -73,8 +69,8 @@ module.exports.search = async (event) => {
   return setResponse(statusCode, response, queryParams);
 };
 
-module.exports.deleteTeamPlayer = async (event) => {
-  let { queryParams } = parseEvent(event);
+export const deleteTeamPlayer = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  const { queryParams } = parseEvent(event);
   let response = {};
   let statusCode = 200;
   try {

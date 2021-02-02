@@ -5,9 +5,20 @@ module.exports = {
     es6: true,
     "jest/globals": true
   },
-  plugins: ["prettier", "jest"],
+  plugins: ["prettier", "jest", "@typescript-eslint"],
+  parser: '@typescript-eslint/parser',
+  settings: {
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    },
+    'import/resolver': {
+      typescript: {},
+    },
+  },
   extends: [
     "eslint:recommended",
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
     "plugin:prettier/recommended"
   ],
   globals: {
@@ -15,7 +26,10 @@ module.exports = {
     SharedArrayBuffer: "readonly"
   },
   parserOptions: {
-    ecmaVersion: 2018
+    project: './tsconfig.json',
+    tsconfigRootDir: './',
+    sourceType: 'module',
+    ecmaVersion: 2019,
   },
   rules: {
     "jest/no-disabled-tests": "warn",

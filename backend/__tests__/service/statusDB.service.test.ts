@@ -1,9 +1,10 @@
-const {
+import { PlayerStatus, PlayerTypes, Status } from '../../../common/models';
+import {
   createStatusRecord,
   searchStatusRecord,
   deleteStatusRecord,
   updatePlayerStatusRecord,
-} = require('../../src/service/statusDB.service');
+} from '../../src/service/statusDB.service';
 
 const testTeams = [
   {
@@ -124,10 +125,23 @@ describe('statusDB.service', () => {
     });
   });
   describe('when updating a player status record', () => {
-    const saveTeam = {
+    const saveTeam: Status = {
       teamId: 'updatePlayerTeamId',
       gameId: 'updatePlayerGameId',
-      players: { firstPlayerId: { status: 'startStatus', snsMessageId: 'startSns' } },
+      players: {
+        firstPlayerId: {
+          id: 'testId2',
+          phoneNumber: '1234567894',
+          sendEmail: false,
+          sendText: false,
+          email: 'testEmail@testEmail.com',
+          type: PlayerTypes.FULL,
+          status: PlayerStatus.OUT,
+          smsDelivered: false,
+          firstName: 'testFirstName',
+          lastName: 'testLastName',
+        },
+      },
     };
     const updatePlayerBaseParams = {
       teamId: saveTeam.teamId,

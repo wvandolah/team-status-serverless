@@ -1,13 +1,7 @@
-/* eslint-disable no-unused-vars */
-
-const {
-  createStatusRecord,
-  updatePlayerStatusRecord,
-  sendNotifications,
-} = require('../../src/service/statusDB.service');
-const { sendStatusEmail } = require('../../src/service/sendStatus.service');
-const { setResponse } = require('../../src/helper');
-const { sendStatusRequest, resendStatusRequest } = require('../../src/controller/sendStatus');
+import { sendStatusEmail } from '../../src/service/sendStatus.service';
+import { setResponse } from '../../src/helper';
+import { sendStatusRequest, resendStatusRequest } from '../../src/controller/sendStatus';
+import { APIGatewayProxyEvent } from 'aws-lambda';
 jest.mock('../../src/service/statusDB.service', () => {
   return {
     createStatusRecord: jest.fn().mockReturnThis(),
@@ -21,6 +15,8 @@ jest.mock('../../src/service/sendStatus.service', () => {
     sendNotifications: jest.fn(),
   };
 });
+
+const mockSendStatusEmail = sendStatusEmail as jest.Mock<any>;
 
 jest.mock('aws-sdk', () => {
   const mockedSES = {
@@ -57,13 +53,33 @@ describe('sendStatus', () => {
     opponentName: 'opponentNameTest',
     teamName: 'teamNameTest',
   };
+
+  const baseEvent: APIGatewayProxyEvent = {
+    body: '',
+    headers: {},
+    httpMethod: 'GET',
+    isBase64Encoded: false,
+    path: '',
+    pathParameters: {},
+    queryStringParameters: undefined,
+    stageVariables: {},
+    requestContext: undefined,
+    multiValueHeaders: undefined,
+    multiValueQueryStringParameters: undefined,
+    resource: '',
+  };
+
   afterEach(() => {
     jest.clearAllMocks();
   });
   describe('when sending status requests', () => {
     test('it returns status 201 when given valid inputs', async () => {
-      const event = { queryStringParameters: '', body: JSON.stringify(validTestTeam) };
-      sendStatusEmail.mockImplementationOnce(() => {
+      const event = {
+        ...baseEvent,
+        queryStringParameters: undefined,
+        body: JSON.stringify(validTestTeam),
+      };
+      mockSendStatusEmail.mockImplementationOnce(() => {
         return { sesReturn: '', sentEmails: testValidPlayers };
       });
       const actual = await sendStatusRequest(event);
@@ -71,8 +87,8 @@ describe('sendStatus', () => {
       expect(actual.statusCode).toEqual(expected.statusCode);
     });
     test('it returns status 400 when given inValid inputs', async () => {
-      const event = { queryStringParameters: '', body: JSON.stringify({}) };
-      sendStatusEmail.mockImplementationOnce(() => {
+      const event = { ...baseEvent, queryStringParameters: undefined, body: JSON.stringify({}) };
+      mockSendStatusEmail.mockImplementationOnce(() => {
         return { sesReturn: '', sentEmails: testValidPlayers };
       });
       const actual = await sendStatusRequest(event);
@@ -81,8 +97,8 @@ describe('sendStatus', () => {
     });
     test('it returns status 500 when unable to send', async () => {
       jest.resetAllMocks();
-      const event = { queryStringParameters: '', body: JSON.stringify(validTestTeam) };
-      sendStatusEmail.mockImplementationOnce(() => {
+      const event = { ...baseEvent, queryStringParameters: undefined, body: JSON.stringify(validTestTeam) };
+      mockSendStatusEmail.mockImplementationOnce(() => {
         throw new Error('TestError');
       });
       const actual = await sendStatusRequest(event);
@@ -92,8 +108,8 @@ describe('sendStatus', () => {
   });
   describe('when resendStatusRequest', () => {
     test('it returns status 201 when given valid inputs', async () => {
-      const event = { queryStringParameters: '', body: JSON.stringify(validTestTeam) };
-      sendStatusEmail.mockImplementationOnce(() => {
+      const event = { ...baseEvent, queryStringParameters: undefined, body: JSON.stringify(validTestTeam) };
+      mockSendStatusEmail.mockImplementationOnce(() => {
         return { sesReturn: '', sentEmails: testValidPlayers };
       });
       const actual = await resendStatusRequest(event);
@@ -101,8 +117,8 @@ describe('sendStatus', () => {
       expect(actual.statusCode).toEqual(expected.statusCode);
     });
     test('it returns status 400 when given inValid inputs', async () => {
-      const event = { queryStringParameters: '', body: JSON.stringify({}) };
-      sendStatusEmail.mockImplementationOnce(() => {
+      const event = { ...baseEvent, queryStringParameters: undefined, body: JSON.stringify({}) };
+      mockSendStatusEmail.mockImplementationOnce(() => {
         return { sesReturn: '', sentEmails: testValidPlayers };
       });
       const actual = await resendStatusRequest(event);
@@ -111,8 +127,8 @@ describe('sendStatus', () => {
     });
     test('it returns status 500 when unable to send', async () => {
       jest.resetAllMocks();
-      const event = { queryStringParameters: '', body: JSON.stringify(validTestTeam) };
-      sendStatusEmail.mockImplementationOnce(() => {
+      const event = { ...baseEvent, queryStringParameters: undefined, body: JSON.stringify(validTestTeam) };
+      mockSendStatusEmail.mockImplementationOnce(() => {
         throw new Error('TestError');
       });
       const actual = await resendStatusRequest(event);

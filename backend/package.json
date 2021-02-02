@@ -6,12 +6,18 @@
   "author": "William VanDolah <william.vandolah@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "local": "serverless offline start",
+    "local": "serverless offline start --noAuth",
     "test": "jest",
     "testCoverage": "jest --coverage"
   },
   "devDependencies": {
+    "@serverless/typescript": "^2.16.0",
     "@shelf/jest-dynamodb": "^1.7.0",
+    "@types/aws-lambda": "^8.10.64",
+    "@types/jest": "^26.0.20",
+    "@types/jsonwebtoken": "^8.5.0",
+    "@types/node": "^14.14.6",
+    "@types/shortid": "0.0.29",
     "aws-sdk": "^2.729.0",
     "jest": "^26.2.2",
     "mock-jwks": "^0.3.1",
@@ -19,7 +25,14 @@
     "serverless": "^2.20.1",
     "serverless-domain-manager": "^5.1.0",
     "serverless-dynamodb-local": "^0.2.39",
-    "serverless-offline": "^6.8.0"
+    "serverless-offline": "^6.8.0",
+    "serverless-webpack": "^5.3.5",
+    "ts-jest": "^26.4.4",
+    "typescript": "^4.0.5",
+    "webpack": "^5.19.0",
+    "webpack-node-externals": "^2.5.2",
+    "ts-loader": "^8.0.13",
+    "ts-node": "^9.1.1"
   },
   "dependencies": {
     "jsonwebtoken": "^8.5.1",

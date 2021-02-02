@@ -1,12 +1,13 @@
-'use strict';
+import { searchStatusRecord, deleteStatusRecord, updatePlayerStatusRecord } from '../service/statusDB.service';
+import { sendStatusTypes, setResponse, parseEvent, sumAttendance } from '../helper';
+import { StatusUpdateOutput, Player, StatusQueryOutput, TeamPlayer } from '../../../common/models';
+import { sendNotifications, sendDeleteEmail } from '../service/sendStatus.service';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 
-const { searchStatusRecord, deleteStatusRecord, updatePlayerStatusRecord } = require('../service/statusDB.service');
-const { sendStatusTypes, setResponse, parseEvent, sumAttendance } = require('../helper');
-const { sendNotifications, sendDeleteEmail } = require('../service/sendStatus.service');
-
-module.exports.searchStatus = async (event) => {
+export const searchStatus = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const { queryParams } = parseEvent(event);
-  let response = {};
+  let response: StatusQueryOutput;
   let statusCode = 200;
   try {
     console.info('Searching player Status for: ', JSON.stringify(queryParams));
@@ -18,7 +19,7 @@ module.exports.searchStatus = async (event) => {
         [queryParams.playerId]: { ...response.Items[0].players[queryParams.playerId] },
       };
     } else {
-      response = {};
+      response = { Count: 0 };
     }
   } catch (err) {
     console.warn(JSON.stringify(err));
@@ -31,9 +32,9 @@ module.exports.searchStatus = async (event) => {
   return setResponse(statusCode, response, queryParams);
 };
 
-module.exports.searchStatuses = async (event) => {
+export const searchStatuses = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const { queryParams } = parseEvent(event);
-  let response = {};
+  let response: StatusQueryOutput;
   let statusCode = 200;
   try {
     response = await searchStatusRecord(queryParams);
@@ -53,16 +54,16 @@ module.exports.searchStatuses = async (event) => {
   return setResponse(statusCode, response, queryParams);
 };
 
-module.exports.deleteStatus = async (event) => {
+export const deleteStatus = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const { data } = parseEvent(event);
-  let response = {};
+  let response: StatusUpdateOutput;
   let statusCode = 200;
   try {
     if ('teamId' in data && 'gameId' in data) {
       response = await deleteStatusRecord(data);
       const gameTime = new Date(response.Attributes.dateTime);
       const toSendEmail = [];
-      Object.values(response.Attributes.players).forEach((player) => {
+      Object.values(response.Attributes.players).forEach((player: Player) => {
         if (player.sendEmail) {
           toSendEmail.push(player);
         }
@@ -88,8 +89,8 @@ module.exports.deleteStatus = async (event) => {
   return setResponse(statusCode, response, data);
 };
 
-module.exports.updatePlayerStatus = async (event) => {
-  let { data } = parseEvent(event);
+export const updatePlayerStatus = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  const { data } = parseEvent(event);
   let response = {};
   let statusCode = 201;
   try {
