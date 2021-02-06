@@ -47,7 +47,7 @@ export const setResponse = (statusCode: number, body, request): APIGatewayProxyR
   return {
     statusCode: statusCode,
     headers: {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': `https://${process.env.domainName}`,
       'Access-Control-Allow-Credentials': true,
     },
 

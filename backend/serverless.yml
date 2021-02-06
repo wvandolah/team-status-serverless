@@ -9,10 +9,15 @@ plugins:
 custom:
   stage: ${opt:stage, self:provider.stage}
   domains:
-    prod: teamstatus-api.wvandolah.com
-    dev: teamstatus-api-dev.wvandolah.com
+    root: wvandolah.com
+    api: 
+      prod: teamstatus-api.${self:custom.domains.root}
+      dev: teamstatus-api-${self:custom.stage}.${self:custom.domains.root}
+    ui:
+      prod: teamstatus.${self:custom.domains.root}
+      dev: teamstatus-${self:custom.stage}.${self:custom.domains.root}
   customDomain:
-    domainName: ${self:custom.domains.${self:custom.stage}}
+    domainName: ${self:custom.domains.api.${self:custom.stage}}
     basePath: ''
     stage: ${self:custom.stage}
     createRoute53Record: true
@@ -42,6 +47,8 @@ custom:
 provider:
   name: aws
   runtime: nodejs12.x
+  environment:
+    domainName: ${self:custom.domains.ui.${self:custom.stage}}
   iamRoleStatements:
     - Effect: Allow
       Action:
