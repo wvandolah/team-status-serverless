@@ -1,12 +1,19 @@
 import { searchStatusRecord, deleteStatusRecord, updatePlayerStatusRecord } from '../service/statusDB.service';
 import { sendStatusTypes, setResponse, parseEvent, sumAttendance } from '../helper';
-import { StatusUpdateOutput, Player, StatusQueryOutput, TeamPlayer } from '../../../common/models';
+import type {
+  StatusUpdateOutput,
+  Player,
+  StatusQueryOutput,
+  APIEvent,
+  SearchStatus,
+  UpdatePlayerStatusBody,
+  SearchStatuses,
+} from '../../../common/models';
 import { sendNotifications, sendDeleteEmail } from '../service/sendStatus.service';
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { DocumentClient } from 'aws-sdk/clients/dynamodb';
+import type { APIGatewayProxyResult } from 'aws-lambda';
 
-export const searchStatus = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  const { queryParams } = parseEvent(event);
+export const searchStatus = async (event: APIEvent<SearchStatus>): Promise<APIGatewayProxyResult> => {
+  const { queryParams } = parseEvent<unknown, SearchStatus>(event);
   let response: StatusQueryOutput;
   let statusCode = 200;
   try {
@@ -32,8 +39,8 @@ export const searchStatus = async (event: APIGatewayProxyEvent): Promise<APIGate
   return setResponse(statusCode, response, queryParams);
 };
 
-export const searchStatuses = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  const { queryParams } = parseEvent(event);
+export const searchStatuses = async (event: APIEvent<SearchStatuses>): Promise<APIGatewayProxyResult> => {
+  const { queryParams } = parseEvent<unknown, SearchStatuses>(event);
   let response: StatusQueryOutput;
   let statusCode = 200;
   try {
@@ -54,8 +61,8 @@ export const searchStatuses = async (event: APIGatewayProxyEvent): Promise<APIGa
   return setResponse(statusCode, response, queryParams);
 };
 
-export const deleteStatus = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  const { data } = parseEvent(event);
+export const deleteStatus = async (event: APIEvent<unknown>): Promise<APIGatewayProxyResult> => {
+  const { data } = parseEvent<UpdatePlayerStatusBody, unknown>(event);
   let response: StatusUpdateOutput;
   let statusCode = 200;
   try {
@@ -89,8 +96,8 @@ export const deleteStatus = async (event: APIGatewayProxyEvent): Promise<APIGate
   return setResponse(statusCode, response, data);
 };
 
-export const updatePlayerStatus = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  const { data } = parseEvent(event);
+export const updatePlayerStatus = async (event: APIEvent<unknown>): Promise<APIGatewayProxyResult> => {
+  const { data } = parseEvent<UpdatePlayerStatusBody, unknown>(event);
   let response = {};
   let statusCode = 201;
   try {

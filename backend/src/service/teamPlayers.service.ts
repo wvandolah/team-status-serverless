@@ -1,5 +1,3 @@
-'use strict';
-
 import { TeamPlayer, TeamPlayerQueryOutput, TeamPlayerUpdateOutput } from '../../../common/models';
 import { dynamodb } from '../config/dynamodb';
 

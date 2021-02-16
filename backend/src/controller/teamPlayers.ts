@@ -1,4 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import type { ResponseError, TeamPlayer, TeamPlayerQueryOutput, TeamPlayerUpdateOutput } from '../../../common/models';
 import { setResponse, parseEvent } from '../helper';
 import { createTeamPlayerRecord, searchTeamPlayerRecord, deleteTeamPlayerRecord } from '../service/teamPlayers.service';
 
@@ -17,12 +18,12 @@ import { createTeamPlayerRecord, searchTeamPlayerRecord, deleteTeamPlayerRecord 
   * 
  */
 export const create = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  const { data } = parseEvent(event);
-  let response = {};
+  const { data } = parseEvent<TeamPlayer, unknown>(event);
+  let response: TeamPlayer | ResponseError;
   let statusCode = 201;
   try {
     if ('userId' in data && 'teamId' in data && 'players' in data && data.players.length > 0) {
-      const record = {
+      const record: TeamPlayer = {
         userId: data.userId,
         teamId: data.teamId,
         players: data.players,
@@ -48,7 +49,7 @@ export const create = async (event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
 export const search = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const { queryParams } = parseEvent(event);
-  let response = {};
+  let response: TeamPlayerQueryOutput;
   let statusCode = 200;
   try {
     if (queryParams && 'userId' in queryParams) {
@@ -71,7 +72,7 @@ export const search = async (event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
 export const deleteTeamPlayer = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const { queryParams } = parseEvent(event);
-  let response = {};
+  let response: TeamPlayerUpdateOutput;
   let statusCode = 200;
   try {
     if ('userId' in queryParams && 'teamId' in queryParams) {

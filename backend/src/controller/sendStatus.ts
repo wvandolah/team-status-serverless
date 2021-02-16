@@ -2,16 +2,17 @@ import { setResponse, parseEvent, sendStatusTypes } from '../helper';
 import { sendNotifications, sendStatusEmail } from '../service/sendStatus.service';
 import { createStatusRecord, updatePlayerStatusRecord } from '../service/statusDB.service';
 import * as shortid from 'shortid';
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { ResponseError, Status } from '../../../common/models';
+import { APIGatewayProxyResult } from 'aws-lambda';
+import type { APIEvent, ResponseError, SearchStatus, StatusUpdateBody, Status } from '../../../common/models';
 
-export const sendStatusRequest = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  const { data } = parseEvent(event);
+export const sendStatusRequest = async (event: APIEvent<SearchStatus>): Promise<APIGatewayProxyResult> => {
+  const { data } = parseEvent<StatusUpdateBody, SearchStatus>(event);
   let statusCode = 201;
   let response: Status | ResponseError;
   try {
     if (data.players && data.players.length > 0 && 'teamId' in data && 'dateTime' in data) {
       const gameId = shortid.generate();
+
       await sendNotifications({ ...data, gameId: gameId }, sendStatusTypes.NEW_GAME);
 
       const { sesReturn } = sendStatusEmail(data.players, data, gameId);
@@ -33,8 +34,8 @@ export const sendStatusRequest = async (event: APIGatewayProxyEvent): Promise<AP
   return setResponse(statusCode, response, data);
 };
 
-export const resendStatusRequest = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  const { data } = parseEvent(event);
+export const resendStatusRequest = async (event: APIEvent<SearchStatus>): Promise<APIGatewayProxyResult> => {
+  const { data } = parseEvent<StatusUpdateBody, SearchStatus>(event);
   let statusCode = 201;
   let response = {};
   try {

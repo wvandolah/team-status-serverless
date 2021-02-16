@@ -1,5 +1,3 @@
-import { OutgoingHttpHeaders } from 'http';
-
 export interface ResponseError {
   error?: string;
 }
@@ -74,12 +72,37 @@ export interface Attendance {
   noResponse: number;
 }
 
-export interface ParsedEvent {
-  data: any;
-  queryParams: any;
+export interface ParsedEvent<TBody, TParams> {
+  data: TBody;
+  queryParams: TParams;
 }
 
 export interface CheckedNumbers {
   invalidNumbers: string[];
   validNumbers: string[];
+}
+
+export type APIEvent<TParam> = {
+  body: string;
+  queryStringParameters: TParam;
+};
+
+export interface SearchStatuses {
+  teamId: string;
+  gameId: string;
+}
+
+export interface SearchStatus extends SearchStatuses {
+  teamId: string;
+  gameId: string;
+  playerId: string;
+}
+
+export interface UpdatePlayerStatusBody extends SearchStatus {
+  status: PlayerStatus;
+}
+
+export interface StatusUpdateBody extends SearchStatuses {
+  players: Player[];
+  dateTime?: string;
 }

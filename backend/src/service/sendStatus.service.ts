@@ -1,5 +1,3 @@
-'use strict';
-
 import { SNS, SES } from 'aws-sdk';
 const sns = new SNS({ apiVersion: '2010-03-31' });
 const ses = new SES({ apiVersion: '2010-12-01' });

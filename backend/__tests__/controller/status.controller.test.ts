@@ -29,7 +29,7 @@ describe('status', () => {
       teamId: 'statusTeam1',
       gameId: 'gameId1',
       playerId: 'playerId1',
-      status: 'in',
+      status: 'In',
     },
     {
       teamId: 'statusTeam1',
@@ -40,6 +40,7 @@ describe('status', () => {
       teamId: 'statusTeam1',
       gameId: 'gameId3',
       playerId: 'playerId3',
+      status: 'OUT',
     },
     {
       teamId: 'statusTeam2',

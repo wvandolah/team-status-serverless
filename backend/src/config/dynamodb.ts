@@ -1,5 +1,3 @@
-'use strict';
-
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 
 let options: any = { convertEmptyValues: true };
