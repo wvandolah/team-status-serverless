@@ -1,10 +1,6 @@
 import { APIGatewayProxyResult } from 'aws-lambda';
 import { APIEvent, Attendance, ParsedEvent, Player } from '../../common/models';
 
-export const sendStatusTypes = {
-  NEW_GAME: 0,
-  DELETE_GAME: 1,
-};
 export const parseEvent = <TBody, TParams>(event: APIEvent<TParams>): ParsedEvent<TBody, TParams> => {
   return {
     data: JSON.parse(event.body),

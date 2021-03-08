@@ -1,9 +1,16 @@
-import { setResponse, parseEvent, sendStatusTypes } from '../helper';
+import { setResponse, parseEvent } from '../helper';
 import { sendNotifications, sendStatusEmail } from '../service/sendStatus.service';
 import { createStatusRecord, updatePlayerStatusRecord } from '../service/statusDB.service';
 import * as shortid from 'shortid';
 import { APIGatewayProxyResult } from 'aws-lambda';
-import type { APIEvent, ResponseError, SearchStatus, StatusUpdateBody, Status } from '../../../common/models';
+import {
+  APIEvent,
+  ResponseError,
+  SearchStatus,
+  StatusUpdateBody,
+  Status,
+  sendStatusTypes,
+} from '../../../common/models';
 
 export const sendStatusRequest = async (event: APIEvent<SearchStatus>): Promise<APIGatewayProxyResult> => {
   const { data } = parseEvent<StatusUpdateBody, SearchStatus>(event);

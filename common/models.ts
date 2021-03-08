@@ -66,6 +66,12 @@ export enum PlayerStatus {
   IN = 'In',
   OUT = 'Out',
 }
+
+export enum sendStatusTypes {
+  NEW_GAME,
+  DELETE_GAME,
+}
+
 export interface Attendance {
   in: number;
   out: number;
@@ -105,4 +111,6 @@ export interface UpdatePlayerStatusBody extends SearchStatus {
 export interface StatusUpdateBody extends SearchStatuses {
   players: Player[];
   dateTime?: string;
+  teamName?: string;
+  opponentName?: string;
 }

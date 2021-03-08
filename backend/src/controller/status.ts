@@ -1,6 +1,6 @@
 import { searchStatusRecord, deleteStatusRecord, updatePlayerStatusRecord } from '../service/statusDB.service';
-import { sendStatusTypes, setResponse, parseEvent, sumAttendance } from '../helper';
-import type {
+import { setResponse, parseEvent, sumAttendance } from '../helper';
+import {
   StatusUpdateOutput,
   Player,
   StatusQueryOutput,
@@ -8,6 +8,7 @@ import type {
   SearchStatus,
   UpdatePlayerStatusBody,
   SearchStatuses,
+  sendStatusTypes,
 } from '../../../common/models';
 import { sendNotifications, sendDeleteEmail } from '../service/sendStatus.service';
 import type { APIGatewayProxyResult } from 'aws-lambda';

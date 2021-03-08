@@ -6,7 +6,7 @@
   "author": "William VanDolah <william.vandolah@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "local": "serverless offline start --noAuth",
+    "local": "serverless offline start --noAuth --stage local",
     "test": "jest",
     "testCoverage": "jest --coverage"
   },

@@ -1,8 +1,14 @@
-import { SNS, SES } from 'aws-sdk';
+import { SNS, SES, AWSError, Request } from 'aws-sdk';
+import { PublishResponse } from 'aws-sdk/clients/sns';
+import { PromiseResult } from 'aws-sdk/lib/request';
+import { StatusUpdateBody, Status, Player } from '../../../common/models';
 const sns = new SNS({ apiVersion: '2010-03-31' });
 const ses = new SES({ apiVersion: '2010-12-01' });
 
-export const sendNotifications = (data, statusType) => {
+export const sendNotifications = (
+  data: StatusUpdateBody | Status,
+  statusType: number,
+): Promise<PromiseResult<PublishResponse, AWSError>> => {
   const payload = {
     data,
     statusType,
@@ -15,9 +21,14 @@ export const sendNotifications = (data, statusType) => {
         TopicArn: process.env.sendNotificationTopicArn,
       })
       .promise();
+  } else {
+    console.info('not sending due to being offline', data, statusType);
   }
 };
-export const sendDeleteEmail = (players, data) => {
+export const sendDeleteEmail = (
+  players: Player[],
+  data: Status,
+): Promise<PromiseResult<SES.SendBulkTemplatedEmailResponse, AWSError>> | Record<string, unknown> => {
   const params = {
     Destinations: [],
     Source: 'Team Status <doNotReply@wvandolah.com>',
@@ -40,7 +51,8 @@ export const sendDeleteEmail = (players, data) => {
   });
   return params.Destinations.length > 0 ? ses.sendBulkTemplatedEmail(params).promise() : {};
 };
-export const sendStatusEmail = (players, data, gameId) => {
+
+export const sendStatusEmail = (players: Player[], data: StatusUpdateBody, gameId: string): Record<string, unknown> => {
   // https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/ses-examples-sending-email.html
   // template currently is gameNotificationEmail
   // "TemplateData": "{ \"teamName\":\"Alejandro\", \"opponentName\": \"alligator\",  \"dateTime\": \"alligator\",  \"statusLink\": \"alligator\", \"firstName\":\"Alejandro\" }"
@@ -53,11 +65,12 @@ export const sendStatusEmail = (players, data, gameId) => {
     DefaultTemplateData:
       '{ "teamName":"<null>", "opponentName": "<null>",  "dateTime": "<null>",  "statusLink": "<null>", "firstName":"<null>" }',
   };
-
   const sentEmails = [];
   players.forEach((player) => {
     if (player.sendEmail) {
-      const message = `https://teamstatus.wvandolah.com/statusUpdate?t=${data.teamId}&g=${gameId}&p=${player.id}`;
+      const message = `http${process.env.IS_OFFLINE ? '' : 's'}://${process.env.domainName}/statusUpdate?t=${
+        data.teamId
+      }&g=${gameId}&p=${player.id}`;
       const playerParams = {
         Destination: {
           ToAddresses: [player.email],

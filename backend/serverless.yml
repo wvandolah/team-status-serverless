@@ -16,6 +16,7 @@ custom:
     ui:
       prod: teamstatus.${self:custom.domains.root}
       dev: teamstatus-${self:custom.stage}.${self:custom.domains.root}
+      local: localhost:3000
   customDomain:
     domainName: ${self:custom.domains.api.${self:custom.stage}}
     basePath: ''
@@ -33,7 +34,7 @@ custom:
     audience: gameattendants
   dynamodb:
     stages:
-      - ${self:provider.stage}
+      - ${self:custom.stage}
     start:
       inMemory: true
       migrate: true
