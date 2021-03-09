@@ -14,7 +14,7 @@ const getMessage = (statusType, teamInfo, player) => {
       : process.env.baseUrl.replace('<stage>', '');
   switch (statusType) {
     case sendStatusTypes.NEW_GAME:
-      message = `Confirm your status for ${teamInfo.teamName} game at ${dateTime}: ${baseUrl}/statusUpdate?t=${teamInfo.teamId}&g=${teamInfo.gameId}&p=${player.id}`;
+      message = `Confirm your status for ${teamInfo.teamName} game at ${dateTime}: ${baseUrl}/statusUpdate?t=${teamInfo.teamId}&p=${player.id}`;
       break;
     case sendStatusTypes.DELETE_GAME:
       message = `${teamInfo.teamName} game at ${dateTime} has been canceled or rescheduled.`;

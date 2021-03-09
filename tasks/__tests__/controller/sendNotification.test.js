@@ -138,7 +138,7 @@ describe('sendNotification', () => {
             teamInfo.dateTime,
           ).toLocaleString('en-US', {
             timeZone: 'America/Chicago',
-          })}: https://teamstatus.wvandolah.com/statusUpdate?t=${teamInfo.teamId}&g=${teamInfo.gameId}&p=${player.id}`;
+          })}: https://teamstatus.wvandolah.com/statusUpdate?t=${teamInfo.teamId}&p=${player.id}`;
           return [{ Message: message, PhoneNumber: `+1${player.phoneNumber}` }];
         });
       expect(sns.publish.mock.calls).toEqual(sendPlayers);

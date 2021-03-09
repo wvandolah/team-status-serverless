@@ -355,7 +355,7 @@ module.exports = {
     // Mkb09vvwFLOQXi`,
     //   },
     {
-      teamInfo: { teamName: 'testing2s', dateTime: '7/30/2020, 3:44:31 PM', teamId: 'VyXY1ikPw', gameId: 'gameId' },
+      teamInfo: { teamName: 'testing2s', dateTime: '2021-03-09T06:27:10.502Z', teamId: 'VyXY1ikPw', gameId: 'gameId' },
       snsMessageId: '0486ea62-245b-5bc2-842c-bdce11872257',
       player: {
         phoneNumber: '8179391234',
@@ -370,7 +370,7 @@ module.exports = {
     //   data: `eJxlUmFP2zAQ/SuRvw4Xn+04dr91tEWVgFWkZZpWNLmJWywSJ4qdIoT47zjp0DbtW/zu7r137/KGauO9PprNa2vQFM1nm9mv20Wez64X6AI1L850ERagpMwESKLSCFfN8bpr+jZWvPOXvcdG+4Dh8u++y7ntTBHW/b6y/mnTrJ8aZ+76eh8ZR4o8dEbXkSMt2Z4TU2KAkmNeHDhWFChWJDtQfcgUHVV9v/dFZ9tgG7e0VTCdR9Of6Khro0MwrtQuBO2fPS7NCS+1rUyZ1/6mOfr8v9GrqunL7zoUT7EO+Ad/kMuHjMgtp+hxtLc4GRcGhTdky+iSpQIyIIxwRSWQuKOgaaYUVwJACMVEKgFkKjIlKIs4hzQFJqLzYGPKQdcxMEhVBlQAyySwi8/0I/3bDrkm2IMt9OByh6YR+V1elfG5QwYORArgmGlicCo5wzqDFJew33MptT4YtUMXuz964xgllGAiMbAExDTlUyonGU936D22lqayJ9O9nvXa4UZXuuus6cbZfH2/utskeRsv2fV1cjNZT0aJ2hWxQUoSv9141G+H27Pbte6Cj0UY6X2w7nOjHfoCQlJOFQfKRp62s4VZuW0+j3UyIUTwNMK+9sMfOc5sOu28LgYOXZ3Fi0GcAYwEzcmWprs3vm2cP498rZri2ZSJ9olvdZ3sX5NxtaT43G3w9mKqahOjuh3csgz+xbYu2GpuTtHfrHge9mGKDZHFZEPvR53lbHWzvV/EKNH74/sHreMHKA==`,
     // },
     {
-      teamInfo: { teamName: 'testing2s', dateTime: '7/30/2020, 3:44:31 PM', teamId: 'VyXY1ikPw', gameId: 'gameId' },
+      teamInfo: { teamName: 'testing2s', dateTime: '2021-03-09T06:27:10.502Z', teamId: 'VyXY1ikPw', gameId: 'gameId' },
       snsMessageId: 'e1f08614-3a0e-5843-a715-d1bb488aafe9',
       player: {
         phoneNumber: '8179391234',
@@ -389,7 +389,7 @@ module.exports = {
     {
       teamInfo: {
         teamName: 'incorrect',
-        dateTime: '7/30/2020, 3:44:31 PM',
+        dateTime: '2021-03-09T06:27:10.502Z',
         teamId: 'teamIdFor3rdFailedTest',
         gameId: 'gameIdFor3rdFailedTest',
       },

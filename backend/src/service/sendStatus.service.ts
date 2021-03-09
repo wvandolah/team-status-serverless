@@ -56,7 +56,7 @@ export const sendDeleteEmail = (
   return params.Destinations.length > 0 ? ses.sendBulkTemplatedEmail(params).promise() : {};
 };
 
-export const sendStatusEmail = (players: Player[], data: StatusUpdateBody, gameId: string): Record<string, unknown> => {
+export const sendStatusEmail = (players: Player[], data: StatusUpdateBody): Record<string, unknown> => {
   // https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/ses-examples-sending-email.html
   // template currently is gameNotificationEmail
   // "TemplateData": "{ \"teamName\":\"Alejandro\", \"opponentName\": \"alligator\",  \"dateTime\": \"alligator\",  \"statusLink\": \"alligator\", \"firstName\":\"Alejandro\" }"
@@ -74,7 +74,7 @@ export const sendStatusEmail = (players: Player[], data: StatusUpdateBody, gameI
     if (player.sendEmail) {
       const message = `http${process.env.IS_OFFLINE ? '' : 's'}://${process.env.domainName}/statusUpdate?t=${
         data.teamId
-      }&g=${gameId}&p=${player.id}`;
+      }&p=${player.id}`;
       const playerParams = {
         Destination: {
           ToAddresses: [player.email],

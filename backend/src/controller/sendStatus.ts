@@ -22,7 +22,7 @@ export const sendStatusRequest = async (event: APIEvent<SearchStatus>): Promise<
 
       await sendNotifications({ ...data, gameId: gameId }, sendStatusTypes.NEW_GAME);
 
-      const { sesReturn } = sendStatusEmail(data.players, data, gameId);
+      const { sesReturn } = sendStatusEmail(data.players, data);
       await sesReturn;
       const result = buildResults({ ...data, gameId: gameId });
       await createStatusRecord(result);
@@ -48,7 +48,7 @@ export const resendStatusRequest = async (event: APIEvent<SearchStatus>): Promis
   try {
     if (data.players && data.players.length > 0 && 'teamId' in data && 'dateTime' in data) {
       await sendNotifications(data, sendStatusTypes.NEW_GAME);
-      const { sesReturn } = sendStatusEmail(data.players, data, data.gameId);
+      const { sesReturn } = sendStatusEmail(data.players, data);
       await sesReturn;
       await updatePlayerStatusRecord({
         teamId: data.teamId,

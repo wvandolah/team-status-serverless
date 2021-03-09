@@ -131,7 +131,7 @@ describe('smsLogs', () => {
             statusType: 0,
             teamInfo: {
               teamName: 'testing2s',
-              dateTime: '7/30/2020, 3:44:31 PM',
+              dateTime: '2021-03-09T06:27:10.502Z',
               teamId: 'VyXY1ikPw',
               gameId: 'gameId',
             },
@@ -154,7 +154,7 @@ describe('smsLogs', () => {
       expect(sns.publish.mock.calls[0]).toHaveLength(1);
       expect(sns.publish.mock.calls[0][0]).toEqual({
         Message:
-          'Confirm your status for A game at 3/9/2021, 12:27:10 AM: https://teamstatus-dev.wvandolah.com/statusUpdate?t=9hie_SVJi&g=7rQx-4ogw&p=_6tVhnSou',
+          'Confirm your status for A game at 3/9/2021, 12:27:10 AM: https://teamstatus-dev.wvandolah.com/statusUpdate?t=9hie_SVJi&p=_6tVhnSou',
         PhoneNumber: '+18178178171',
       });
     });

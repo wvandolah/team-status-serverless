@@ -92,7 +92,7 @@ describe('sendStatus.service', () => {
       ];
 
       mockPromise.mockResolvedValueOnce('mockResponse');
-      const { sesReturn, sentEmails } = sendStatusEmail(players, body, 'gameId');
+      const { sesReturn, sentEmails } = sendStatusEmail(players, body);
       expect(sentEmails).toEqual(players);
       expect(await sesReturn).toBe('mockResponse');
     });
@@ -124,7 +124,7 @@ describe('sendStatus.service', () => {
         },
       ];
       mockPromise.mockResolvedValueOnce('mockResponse');
-      const { sesReturn, sentEmails } = sendStatusEmail(players, body, 'gameId');
+      const { sesReturn, sentEmails } = sendStatusEmail(players, body);
       expect(sentEmails).toHaveLength(0);
       expect(sesReturn).toEqual({});
     });

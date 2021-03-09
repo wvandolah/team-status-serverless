@@ -60,6 +60,7 @@ export const searchStatuses = async (event: APIEvent<SearchStatuses>): Promise<A
     response = await searchStatusRecord(queryParams);
     if (response.Count > 0) {
       for (let i = 0; i < response.Count; i++) {
+        response.Items[i].players = Object.values(response.Items[i].players);
         response.Items[i]['attendance'] = sumAttendance(Object.values(response.Items[i].players));
       }
     }
