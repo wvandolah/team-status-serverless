@@ -1,4 +1,12 @@
-import { StatusUpdateOutput, Status, StatusQueryOutput, StatusUpdateInput } from '../../../common/models';
+import type { DocumentClient } from 'aws-sdk/lib/dynamodb/document_client';
+import {
+  StatusUpdateOutput,
+  Status,
+  StatusQueryOutput,
+  StatusUpdateInput,
+  SearchStatus,
+  SearchStatuses,
+} from '../../../common/models';
 import { dynamodb } from '../config/dynamodb';
 
 export const createStatusRecord = (record: Status): Promise<StatusUpdateOutput> => {
@@ -23,29 +31,44 @@ export const createStatusRecord = (record: Status): Promise<StatusUpdateOutput> 
 //     if (err) ppJson(err); // an error occurred
 //     else ppJson(data); // successful response
 // });
-export const searchStatusRecord = (searchParams: Status): Promise<StatusQueryOutput> => {
-  const { teamId, gameId } = searchParams;
-  let keyString = '';
-  let expressionAttObj = {};
-  if (teamId && gameId) {
-    keyString = `teamId = :teamId and gameId = :gameId`;
-    expressionAttObj = {
-      ':teamId': teamId,
-      ':gameId': gameId,
-    };
-  } else if (teamId && !gameId) {
-    keyString = 'teamId = :teamId';
-    expressionAttObj = {
-      ':teamId': teamId,
-    };
-  } else {
+export const searchStatusRecord = (searchParams: SearchStatus | SearchStatuses): Promise<StatusQueryOutput> => {
+  const { teamId, historic } = searchParams;
+  const returnHistoric = historic === 'true';
+
+  if (!teamId) {
     throw new Error('Team information not provided');
   }
-  const params = {
+  const currentDate = new Date().toISOString();
+  const params: DocumentClient.QueryInput = {
     TableName: process.env.tableGameAttendants,
-    KeyConditionExpression: keyString,
-    ExpressionAttributeValues: expressionAttObj,
+    KeyConditionExpression: 'teamId = :teamId',
+    ExpressionAttributeValues: {
+      ':teamId': teamId,
+    },
   };
+
+  if (!returnHistoric) {
+    params.ExpressionAttributeNames = {
+      '#gameTime': 'dateTime',
+    };
+    params.ExpressionAttributeValues[':searchDate'] = currentDate;
+    params.FilterExpression = '#gameTime >= :searchDate';
+  }
+
+  if ('playerId' in searchParams) {
+    const playerId = searchParams.playerId;
+    params.ExpressionAttributeValues[':playerId'] = playerId;
+    params.FilterExpression = returnHistoric
+      ? '#players.#player.#playerId = :playerId'
+      : '#gameTime >= :searchDate AND #players.#player.#playerId = :playerId';
+
+    params.ExpressionAttributeNames = {
+      ...params.ExpressionAttributeNames,
+      '#players': 'players',
+      '#player': playerId,
+      '#playerId': 'id',
+    };
+  }
   return dynamodb.query(params).promise();
 };
 

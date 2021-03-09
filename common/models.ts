@@ -96,11 +96,10 @@ export type APIEvent<TParam> = {
 export interface SearchStatuses {
   teamId: string;
   gameId: string;
+  historic: string;
 }
 
 export interface SearchStatus extends SearchStatuses {
-  teamId: string;
-  gameId: string;
   playerId: string;
 }
 

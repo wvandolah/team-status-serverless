@@ -203,7 +203,7 @@ module.exports = {
       teamName: 'testTeam',
     },
     {
-      dateTime: '8/29/2020, 2:36:31 PM',
+      dateTime: '2021-03-09T06:27:10.502Z',
       gameId: '7rQx-4ogw',
       opponentName: null,
       players: {
@@ -256,7 +256,7 @@ module.exports = {
       teamName: 'A',
     },
     {
-      dateTime: '8/29/2020, 2:36:31 PM',
+      dateTime: '2021-03-09T06:27:10.502Z',
       gameId: 'gameId',
       opponentName: null,
       players: {
@@ -309,7 +309,7 @@ module.exports = {
       teamName: 'A',
     },
     {
-      dateTime: '8/29/2020, 2:36:31 PM',
+      dateTime: '2021-03-09T06:27:10.502Z',
       gameId: 'gameIdFor3rdFailedTest',
       opponentName: null,
       players: {
@@ -339,7 +339,7 @@ module.exports = {
         id: '_6tVhnSou',
         snsMessageId: '1827f3a4-c3ae-5db4-b9df-a4604ff353cd',
       },
-      teamInfo: { teamName: 'A', dateTime: '8/29/2020, 2:36:31 PM', gameId: '7rQx-4ogw', teamId: '9hie_SVJi' },
+      teamInfo: { teamName: 'A', dateTime: '2021-03-09T06:27:10.502Z', gameId: '7rQx-4ogw', teamId: '9hie_SVJi' },
     },
 
     // Log data that contains snsID: 0486ea62-245b-5bc2-842c-bdce11872257

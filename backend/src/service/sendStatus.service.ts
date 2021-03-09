@@ -44,7 +44,11 @@ export const sendDeleteEmail = (
         Destination: {
           ToAddresses: [player.email],
         },
-        ReplacementTemplateData: `{ "teamName":"${data.teamName}", "opponentName":"${data.opponentName}",  "dateTime": "${data.dateTime}", "firstName":"${player.firstName}"}`,
+        ReplacementTemplateData: `{ "teamName":"${data.teamName}", "opponentName":"${
+          data.opponentName
+        }",  "dateTime": "${new Date(data.dateTime).toLocaleString('en-US', {
+          timeZone: 'America/Chicago',
+        })}", "firstName":"${player.firstName}"}`,
       };
       params.Destinations.push(playerParams);
     }
@@ -75,7 +79,11 @@ export const sendStatusEmail = (players: Player[], data: StatusUpdateBody, gameI
         Destination: {
           ToAddresses: [player.email],
         },
-        ReplacementTemplateData: `{ "teamName":"${data.teamName}", "opponentName":"${data.opponentName}",  "dateTime": "${data.dateTime}",  "statusLink": "${message}", "firstName":"${player.firstName}"}`,
+        ReplacementTemplateData: `{ "teamName":"${data.teamName}", "opponentName":"${
+          data.opponentName
+        }",  "dateTime": "${new Date(data.dateTime).toLocaleString('en-US', {
+          timeZone: 'America/Chicago',
+        })}",  "statusLink": "${message}", "firstName":"${player.firstName}"}`,
       };
       params.Destinations.push(playerParams);
       sentEmails.push(player);

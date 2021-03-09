@@ -10,14 +10,54 @@ const testTeams = [
   {
     teamId: 'statusTeam1',
     gameId: 'statusGame1',
+    dateTime: '2099-03-03T17:15:00.000Z',
+    players: {
+      playerId0: {
+        id: 'playerId0',
+        email: 'dummy-email',
+        firstName: 'dummy-firstName',
+        lastName: 'dummy-lastName',
+        phoneNumber: 'dummy-phoneNumber',
+        sendEmail: true,
+        sendText: true,
+        smsDelivered: true,
+        type: PlayerTypes.FULL,
+      },
+    },
   },
   {
     teamId: 'statusTeam1',
     gameId: 'statusGame2',
+    players: {
+      playerId1: {
+        id: 'playerId1',
+        email: 'dummy-email',
+        firstName: 'dummy-firstName',
+        lastName: 'dummy-lastName',
+        phoneNumber: 'dummy-phoneNumber',
+        sendEmail: true,
+        sendText: true,
+        smsDelivered: true,
+        type: PlayerTypes.FULL,
+      },
+    },
   },
   {
     teamId: 'statusTeam1',
     gameId: 'statusGame3',
+    players: {
+      playerId0: {
+        id: 'playerId0',
+        email: 'dummy-email',
+        firstName: 'dummy-firstName',
+        lastName: 'dummy-lastName',
+        phoneNumber: 'dummy-phoneNumber',
+        sendEmail: true,
+        sendText: true,
+        smsDelivered: true,
+        type: PlayerTypes.FULL,
+      },
+    },
   },
   {
     teamId: 'statusTeam2',
@@ -35,7 +75,7 @@ beforeAll(() => {
 describe('statusDB.service', () => {
   describe('when creating new status record', () => {
     test('it saves to database', async () => {
-      const saveTeam = { teamId: 'teamId', gameId: 'gameId' };
+      const saveTeam = { teamId: 'teamId', gameId: 'gameId', historic: 'true' };
       await createStatusRecord(saveTeam);
       const actual = await searchAndExtractResults(saveTeam);
       expect(actual[0]).toEqual(saveTeam);
@@ -61,25 +101,20 @@ describe('statusDB.service', () => {
   });
 
   describe('when searching status record', () => {
-    test('it finds all records by gameId and teamId', async () => {
-      const actual = await searchAndExtractResults(testTeams[0]);
-      expect(actual[0]).toEqual(testTeams[0]);
-    });
-
     test('it returns nothing when no teams found', async () => {
       const actual = await searchAndExtractResults({ teamId: 'invalidTeamId', gameId: 'gameId' });
       expect(actual).toHaveLength(0);
     });
 
     test('it returns all team games when only searching teamId', async () => {
-      const actual = await searchAndExtractResults({ teamId: 'statusTeam1' });
+      const actual = await searchAndExtractResults({ teamId: 'statusTeam1', historic: 'true' });
       expect(actual).toHaveLength(3);
       for (let i = 0; i < 3; i++) {
         expect(actual[i].teamId).toBe(testTeams[i].teamId);
         expect(actual[i].gameId).toBe(testTeams[i].gameId);
       }
 
-      const actual2 = await searchAndExtractResults({ teamId: 'statusTeam2' });
+      const actual2 = await searchAndExtractResults({ teamId: 'statusTeam2', historic: 'true' });
       expect(actual2).toHaveLength(2);
       for (let i = 0; i < 2; i++) {
         expect(actual2[i].teamId).toBe(testTeams[i + 3].teamId);
@@ -87,8 +122,45 @@ describe('statusDB.service', () => {
       }
     });
 
+    test('it returns all future team games when only searching teamId and historic is false', async () => {
+      const actual = await searchAndExtractResults({ teamId: 'statusTeam1', historic: 'false' });
+      expect(actual).toHaveLength(1);
+      for (let i = 0; i < 1; i++) {
+        expect(actual[i].teamId).toBe(testTeams[i].teamId);
+        expect(actual[i].gameId).toBe(testTeams[i].gameId);
+      }
+    });
+
+    test('it returns all team games for player when searching teamId and playerId and historic is true', async () => {
+      const actual = await searchAndExtractResults({
+        teamId: 'statusTeam1',
+        historic: 'true',
+        playerId: 'playerId1',
+      });
+      expect(actual).toHaveLength(1);
+
+      expect(actual[0].teamId).toBe(testTeams[1].teamId);
+      expect(actual[0].gameId).toBe(testTeams[1].gameId);
+      expect(actual[0].players['playerId1'].id).toBe('playerId1');
+    });
+
+    test('it returns future team games for player when searching teamId and playerId and historic is false', async () => {
+      const actual = await searchAndExtractResults({
+        teamId: 'statusTeam1',
+        historic: 'false',
+        playerId: 'playerId0',
+      });
+      expect(actual).toHaveLength(1);
+
+      expect(actual[0].teamId).toBe(testTeams[0].teamId);
+      expect(actual[0].gameId).toBe(testTeams[0].gameId);
+      expect(actual[0].players['playerId0'].id).toBe('playerId0');
+    });
+
     test('if no teamId, throws error', async () => {
       try {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         await searchStatusRecord({ gameId: 'gameId' });
         expect(true).toBe(false);
       } catch (e) {

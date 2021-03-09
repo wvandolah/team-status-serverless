@@ -154,7 +154,7 @@ describe('smsLogs', () => {
       expect(sns.publish.mock.calls[0]).toHaveLength(1);
       expect(sns.publish.mock.calls[0][0]).toEqual({
         Message:
-          'Confirm your status for A game at 8/29/2020, 2:36:31 PM: https://teamstatus-dev.wvandolah.com/statusUpdate?t=9hie_SVJi&g=7rQx-4ogw&p=_6tVhnSou',
+          'Confirm your status for A game at 3/9/2021, 12:27:10 AM: https://teamstatus-dev.wvandolah.com/statusUpdate?t=9hie_SVJi&g=7rQx-4ogw&p=_6tVhnSou',
         PhoneNumber: '+18178178171',
       });
     });

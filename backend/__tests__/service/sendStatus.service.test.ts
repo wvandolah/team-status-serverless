@@ -2,6 +2,7 @@ import { sendNotifications, sendStatusEmail, sendDeleteEmail } from '../../src/s
 import { SNS, SES, Request, AWSError } from 'aws-sdk';
 import { SendBulkTemplatedEmailResponse } from 'aws-sdk/clients/ses';
 import { PromiseResult } from 'aws-sdk/lib/request';
+import { Player, PlayerStatus, PlayerTypes, Status, StatusUpdateBody } from '../../../common/models';
 
 jest.mock('aws-sdk', () => {
   const mockedSNS = {
@@ -32,7 +33,10 @@ describe('sendStatus.service', () => {
       jest.clearAllMocks();
     });
     test('it should publish received data to sns topic', async () => {
-      await sendNotifications('game Data', 0);
+      const sending: Status = {
+        gameId: '1',
+      };
+      await sendNotifications(sending, 0);
       expect(mockPublish.mock.calls).toHaveLength(1);
     });
   });
@@ -40,31 +44,117 @@ describe('sendStatus.service', () => {
   describe('when sending email', () => {
     const ses = new SES({ apiVersion: '2010-12-01' });
     const mockPromise = ses.sendBulkTemplatedEmail().promise as jest.Mock<any>;
+    const body: StatusUpdateBody = {
+      players: [
+        {
+          sendEmail: true,
+          email: 'test@test.com',
+          firstName: 'testName',
+          id: 'test-id',
+          lastName: 'test-lastName',
+          phoneNumber: 'test-phoneNumber',
+          sendText: true,
+          status: PlayerStatus.IN,
+          smsDelivered: false,
+          type: PlayerTypes.FULL,
+        },
+      ],
+      teamId: 'teamId-test',
+      gameId: 'gameId-test',
+      historic: 'historic-test',
+    };
     test('new it should return sent emails and ses ids when successful', async () => {
-      const players = [
-        { sendEmail: true, email: 'test@test.com', firstNam: 'testName' },
-        { sendEmail: true, email: 'test2@test.com', firstNam: 'test2Name' },
+      const players: Player[] = [
+        {
+          sendEmail: true,
+          email: 'test@test.com',
+          firstName: 'testName',
+          id: 'test-id',
+          lastName: 'test-lastName',
+          phoneNumber: 'test-phoneNumber',
+          sendText: true,
+          status: PlayerStatus.IN,
+          smsDelivered: false,
+          type: PlayerTypes.FULL,
+        },
+        {
+          sendEmail: true,
+          email: 'test2@test.com',
+          firstName: 'test2Name',
+          id: 'test-id',
+          lastName: 'test-lastName',
+          phoneNumber: 'test-phoneNumber',
+          sendText: true,
+          status: PlayerStatus.IN,
+          smsDelivered: false,
+          type: PlayerTypes.FULL,
+        },
       ];
+
       mockPromise.mockResolvedValueOnce('mockResponse');
-      const { sesReturn, sentEmails } = sendStatusEmail(players, {}, 'gameId');
+      const { sesReturn, sentEmails } = sendStatusEmail(players, body, 'gameId');
       expect(sentEmails).toEqual(players);
       expect(await sesReturn).toBe('mockResponse');
     });
     test('new it should return empty list of sent emails and empty object when no emails', async () => {
-      const players = [
-        { sendEmail: false, email: 'test@test.com', firstNam: 'testName' },
-        { sendEmail: false, email: 'test2@test.com', firstNam: 'test2Name' },
+      const players: Player[] = [
+        {
+          sendEmail: false,
+          email: 'test@test.com',
+          firstName: 'testName',
+          id: 'test-id',
+          lastName: 'test-lastName',
+          phoneNumber: 'test-phoneNumber',
+          sendText: true,
+          status: PlayerStatus.IN,
+          smsDelivered: false,
+          type: PlayerTypes.FULL,
+        },
+        {
+          sendEmail: false,
+          email: 'test2@test.com',
+          firstName: 'test2Name',
+          id: 'test-id',
+          lastName: 'test-lastName',
+          phoneNumber: 'test-phoneNumber',
+          sendText: true,
+          status: PlayerStatus.IN,
+          smsDelivered: false,
+          type: PlayerTypes.FULL,
+        },
       ];
       mockPromise.mockResolvedValueOnce('mockResponse');
-      const { sesReturn, sentEmails } = sendStatusEmail(players, {}, 'gameId');
+      const { sesReturn, sentEmails } = sendStatusEmail(players, body, 'gameId');
       expect(sentEmails).toHaveLength(0);
       expect(sesReturn).toEqual({});
     });
 
     test('delete it ses ids when successful', async () => {
       const players = [
-        { sendEmail: true, email: 'test@test.com', firstNam: 'testName' },
-        { sendEmail: true, email: 'test2@test.com', firstNam: 'test2Name' },
+        {
+          sendEmail: true,
+          email: 'test@test.com',
+          firstName: 'testName',
+          id: 'test-id',
+          lastName: 'test-lastName',
+          phoneNumber: 'test-phoneNumber',
+          sendText: true,
+          status: PlayerStatus.IN,
+          smsDelivered: false,
+          type: PlayerTypes.FULL,
+        },
+        {
+          sendEmail: true,
+          email: 'test2@test.com',
+          firstName: 'test2Name',
+          id: 'test-id',
+          lastName: 'test-lastName',
+          phoneNumber: 'test-phoneNumber',
+          sendText: true,
+          status: PlayerStatus.IN,
+          smsDelivered: false,
+          type: PlayerTypes.FULL,
+        },
       ];
       mockPromise.mockResolvedValueOnce('mockResponse');
       const actual = await sendDeleteEmail(players, {});
@@ -73,8 +163,30 @@ describe('sendStatus.service', () => {
     });
     test('delete it should return empty list of sent emails and empty object when no emails', async () => {
       const players = [
-        { sendEmail: false, email: 'test@test.com', firstNam: 'testName' },
-        { sendEmail: false, email: 'test2@test.com', firstNam: 'test2Name' },
+        {
+          sendEmail: false,
+          email: 'test@test.com',
+          firstName: 'testName',
+          id: 'test-id',
+          lastName: 'test-lastName',
+          phoneNumber: 'test-phoneNumber',
+          sendText: true,
+          status: PlayerStatus.IN,
+          smsDelivered: false,
+          type: PlayerTypes.FULL,
+        },
+        {
+          sendEmail: false,
+          email: 'test2@test.com',
+          firstName: 'test2Name',
+          id: 'test-id',
+          lastName: 'test-lastName',
+          phoneNumber: 'test-phoneNumber',
+          sendText: true,
+          status: PlayerStatus.IN,
+          smsDelivered: false,
+          type: PlayerTypes.FULL,
+        },
       ];
       mockPromise.mockResolvedValueOnce('mockResponse');
       const actual = await sendDeleteEmail(players, {});

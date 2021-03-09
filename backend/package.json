@@ -8,7 +8,7 @@
   "scripts": {
     "local": "serverless offline start --noAuth --stage local",
     "test": "jest",
-    "testCoverage": "jest --coverage"
+    "testCoverage": "jest --clearCache && jest --coverage"
   },
   "devDependencies": {
     "@serverless/typescript": "^2.16.0",

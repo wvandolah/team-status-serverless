@@ -15,7 +15,7 @@ const expectedValidEvent = {
         TopicArn: 'arn:aws:sns:us-east-1:619887618095:gameattendanttasks-dev-send-notification-topic',
         Subject: null,
         Message:
-          '{"data": {"teamId":"VyXY1ikPw", "gameId":"gameId", "teamName":"testing2s","opponentName":"","dateTime":"7/30/2020, 3:44:31 PM","players":[{"firstName":"William","lastName":"VanDolah","sendEmail":false,"phoneNumber":"8179391234","id":"ZV0xu8M1p","type":null,"email":"success@simulator.amazonses.com","sendText":true}, {"firstName":"William","lastName":"VanDolah","sendEmail":false,"phoneNumber":"8179391234","id":"ZV0xu8M1p","type":null,"email":"success@simulator.amazonses.com","sendText":false}]},"statusType": 0}',
+          '{"data": {"teamId":"VyXY1ikPw", "gameId":"gameId", "teamName":"testing2s","opponentName":"","dateTime":"2021-03-09T06:27:10.502Z","players":[{"firstName":"William","lastName":"VanDolah","sendEmail":false,"phoneNumber":"8179391234","id":"ZV0xu8M1p","type":null,"email":"success@simulator.amazonses.com","sendText":true}, {"firstName":"William","lastName":"VanDolah","sendEmail":false,"phoneNumber":"8179391234","id":"ZV0xu8M1p","type":null,"email":"success@simulator.amazonses.com","sendText":false}]},"statusType": 0}',
         Timestamp: '2020-07-30T20:44:37.943Z',
         SignatureVersion: '1',
         Signature:
@@ -43,7 +43,7 @@ const expectedDeleteValidEvent = {
         TopicArn: 'arn:aws:sns:us-east-1:619887618095:gameattendanttasks-dev-send-notification-topic',
         Subject: null,
         Message:
-          '{"data": {"teamId":"VyXY1ikPw", "gameId":"gameId", "teamName":"testing2s","opponentName":"","dateTime":"7/30/2020, 3:44:31 PM","players":[{"firstName":"William","lastName":"VanDolah","sendEmail":false,"phoneNumber":"8179391234","id":"ZV0xu8M1p","type":null,"email":"success@simulator.amazonses.com","sendText":true}, {"firstName":"William","lastName":"VanDolah","sendEmail":false,"phoneNumber":"8179391234","id":"ZV0xu8M1p","type":null,"email":"success@simulator.amazonses.com","sendText":false}]},"statusType": 1}',
+          '{"data": {"teamId":"VyXY1ikPw", "gameId":"gameId", "teamName":"testing2s","opponentName":"","dateTime":"2021-03-09T06:27:10.502Z","players":[{"firstName":"William","lastName":"VanDolah","sendEmail":false,"phoneNumber":"8179391234","id":"ZV0xu8M1p","type":null,"email":"success@simulator.amazonses.com","sendText":true}, {"firstName":"William","lastName":"VanDolah","sendEmail":false,"phoneNumber":"8179391234","id":"ZV0xu8M1p","type":null,"email":"success@simulator.amazonses.com","sendText":false}]},"statusType": 1}',
         Timestamp: '2020-07-30T20:44:37.943Z',
         SignatureVersion: '1',
         Signature:
@@ -71,7 +71,7 @@ const expectedEvent_invalidPlayerPhoneNumber = {
         TopicArn: 'arn:aws:sns:us-east-1:619887618095:gameattendanttasks-dev-send-notification-topic',
         Subject: null,
         Message:
-          '{"data": {"teamId":"VyXY1ikPw", "gameId":"gameId", "teamName":"testing2s","opponentName":"","dateTime":"7/30/2020, 3:44:31 PM","players":[{"firstName":"William","lastName":"VanDolah","sendEmail":false,"phoneNumber":"879391234","id":"ZV0xu8M1p","type":null,"email":"success@simulator.amazonses.com","sendText":true}, {"firstName":"William","lastName":"VanDolah","sendEmail":false,"phoneNumber":"817a391234","id":"ZV0xu8M1p","type":null,"email":"success@simulator.amazonses.com","sendText":true}]},"statusType": 0}',
+          '{"data": {"teamId":"VyXY1ikPw", "gameId":"gameId", "teamName":"testing2s","opponentName":"","dateTime":"2021-03-09T06:27:10.502Z","players":[{"firstName":"William","lastName":"VanDolah","sendEmail":false,"phoneNumber":"879391234","id":"ZV0xu8M1p","type":null,"email":"success@simulator.amazonses.com","sendText":true}, {"firstName":"William","lastName":"VanDolah","sendEmail":false,"phoneNumber":"817a391234","id":"ZV0xu8M1p","type":null,"email":"success@simulator.amazonses.com","sendText":true}]},"statusType": 0}',
         Timestamp: '2020-07-30T20:44:37.943Z',
         SignatureVersion: '1',
         Signature:
@@ -134,7 +134,11 @@ describe('sendNotification', () => {
       const sendPlayers = teamInfo.players
         .filter((player) => player.sendText)
         .map((player) => {
-          const message = `Confirm your status for ${teamInfo.teamName} game at ${teamInfo.dateTime}: https://teamstatus.wvandolah.com/statusUpdate?t=${teamInfo.teamId}&g=${teamInfo.gameId}&p=${player.id}`;
+          const message = `Confirm your status for ${teamInfo.teamName} game at ${new Date(
+            teamInfo.dateTime,
+          ).toLocaleString('en-US', {
+            timeZone: 'America/Chicago',
+          })}: https://teamstatus.wvandolah.com/statusUpdate?t=${teamInfo.teamId}&g=${teamInfo.gameId}&p=${player.id}`;
           return [{ Message: message, PhoneNumber: `+1${player.phoneNumber}` }];
         });
       expect(sns.publish.mock.calls).toEqual(sendPlayers);
@@ -150,7 +154,9 @@ describe('sendNotification', () => {
       const sendPlayers = teamInfo.players
         .filter((player) => player.sendText)
         .map((player) => {
-          const message = `${teamInfo.teamName} game at ${teamInfo.dateTime} has been canceled or rescheduled.`;
+          const message = `${teamInfo.teamName} game at ${new Date(teamInfo.dateTime).toLocaleString('en-US', {
+            timeZone: 'America/Chicago',
+          })} has been canceled or rescheduled.`;
           return [{ Message: message, PhoneNumber: `+1${player.phoneNumber}` }];
         });
       expect(sns.publish.mock.calls).toEqual(sendPlayers);
@@ -167,7 +173,12 @@ describe('sendNotification', () => {
         retries: 0,
         snsMessageId: 'da5a27f3-a831-5158-8594-70f62df89f77',
         statusType: 0,
-        teamInfo: { dateTime: '7/30/2020, 3:44:31 PM', gameId: 'gameId', teamId: 'VyXY1ikPw', teamName: 'testing2s' },
+        teamInfo: {
+          dateTime: '2021-03-09T06:27:10.502Z',
+          gameId: 'gameId',
+          teamId: 'VyXY1ikPw',
+          teamName: 'testing2s',
+        },
       };
       expect(Items[0]).toEqual(expected);
     });

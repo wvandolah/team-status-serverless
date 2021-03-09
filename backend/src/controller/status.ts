@@ -20,12 +20,25 @@ export const searchStatus = async (event: APIEvent<SearchStatus>): Promise<APIGa
   try {
     console.info('Searching player Status for: ', JSON.stringify(queryParams));
     response = await searchStatusRecord(queryParams);
-    if (response.Count > 0 && response.Items[0].players[queryParams.playerId]) {
-      const attendance = sumAttendance(Object.values(response.Items[0].players));
-      response.Items[0]['attendance'] = attendance;
-      response.Items[0].players = {
-        [queryParams.playerId]: { ...response.Items[0].players[queryParams.playerId] },
-      };
+    if (response.Count > 0) {
+      for (let i = 0; i < response.Count; i++) {
+        response.Items[i]['attendance'] = sumAttendance(Object.values(response.Items[i].players));
+        response.Items[i].players = Object.keys(response.Items[i].players).map((playerId) => {
+          const currentPlayer: Player = response.Items[i].players[playerId];
+          return {
+            firstName: currentPlayer.firstName,
+            id: currentPlayer.id === queryParams.playerId ? currentPlayer.id : null,
+            lastName: currentPlayer.lastName.charAt(0),
+            status: currentPlayer.status,
+            phoneNumber: null,
+            email: null,
+            sendEmail: null,
+            sendText: null,
+            smsDelivered: null,
+            type: currentPlayer.type,
+          };
+        });
+      }
     } else {
       response = { Count: 0 };
     }
@@ -36,7 +49,6 @@ export const searchStatus = async (event: APIEvent<SearchStatus>): Promise<APIGa
       error: err.message,
     };
   }
-
   return setResponse(statusCode, response, queryParams);
 };
 
@@ -101,6 +113,7 @@ export const updatePlayerStatus = async (event: APIEvent<unknown>): Promise<APIG
   const { data } = parseEvent<UpdatePlayerStatusBody, unknown>(event);
   let response = {};
   let statusCode = 201;
+
   try {
     if ('teamId' in data && 'gameId' in data && 'playerId' in data && 'status' in data) {
       console.info('Player updated status with info: ', JSON.stringify(data));

@@ -34,7 +34,7 @@ export const sendStatusRequest = async (event: APIEvent<SearchStatus>): Promise<
       };
     }
   } catch (err) {
-    console.warn(JSON.stringify(err));
+    console.warn('error:', err.message, 'full error', JSON.stringify(err));
     statusCode = 500;
     response = { error: err.message };
   }
