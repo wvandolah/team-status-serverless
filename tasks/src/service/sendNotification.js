@@ -29,7 +29,7 @@ module.exports = {
       Message: getMessage(statusType, teamInfo, player),
       PhoneNumber: `+1${player.phoneNumber.replace(/\D/g, '')}`,
     };
-    console.log('[sendNotification.service]: publishing sms data: ', smsData);
+    console.info('[sendNotification.service]: publishing sms data: ', smsData);
     return sns.publish(smsData).promise();
   },
 };

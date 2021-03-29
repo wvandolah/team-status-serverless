@@ -10,7 +10,7 @@ module.exports.sendSms = async (event) => {
   try {
     const messageInfo = JSON.parse(event.Records[0].Sns.Message);
     const teamInfo = messageInfo.data;
-    console.log('sendSms lambda received msg: ', messageInfo);
+    console.info('sendSms lambda received msg: ', messageInfo);
     const smsPlayers = teamInfo.players.filter((player) => {
       player.phoneNumber = player.phoneNumber.replace(/\D/g, '');
       return checkSendable(player);

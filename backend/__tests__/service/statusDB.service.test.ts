@@ -242,6 +242,60 @@ describe('statusDB.service', () => {
       expect(actual.Attributes.players[updatePlayerStatusParams.playerId].smsDelivered).toEqual('success');
     });
   });
+  describe('when adding a player to exciting game', () => {
+    const saveTeamToUpdate: Status = {
+      teamId: 'saveTeamToUpdateTeamId',
+      gameId: 'saveTeamToUpdaterGameId',
+      players: {
+        firstPlayerId: {
+          id: 'testId2',
+          phoneNumber: '1234567894',
+          sendEmail: false,
+          sendText: false,
+          email: 'testEmail@testEmail.com',
+          type: PlayerTypes.FULL,
+          status: PlayerStatus.OUT,
+          smsDelivered: false,
+          firstName: 'testFirstName',
+          lastName: 'testLastName',
+        },
+      },
+    };
+    const updatePlayerBaseParams = {
+      teamId: saveTeamToUpdate.teamId,
+      gameId: saveTeamToUpdate.gameId,
+      playerId: 'newPlayerId',
+    };
+    const newPlayer = {
+      id: 'newPlayerId',
+      phoneNumber: '1234567894',
+      sendEmail: false,
+      sendText: false,
+      email: 'testEmail@testEmail.com',
+      type: PlayerTypes.FULL,
+      status: PlayerStatus.OUT,
+      smsDelivered: false,
+      firstName: 'newPlayerFirst',
+      lastName: 'newPlayerSecond',
+    };
+    beforeEach(() => {
+      return createStatusRecord(saveTeamToUpdate);
+    });
+    afterEach(() => {
+      return deleteStatusRecord(saveTeamToUpdate);
+    });
+    test('should add new player to existing game', async () => {
+      const actual = await updatePlayerStatusRecord({
+        ...updatePlayerBaseParams,
+        updateField: 'players',
+        updateValue: newPlayer,
+      });
+      expect(actual.Attributes.players).toEqual({
+        firstPlayerId: saveTeamToUpdate.players['firstPlayerId'],
+        newPlayerId: newPlayer,
+      });
+    });
+  });
 });
 
 const searchAndExtractResults = async (gameTeam) => {

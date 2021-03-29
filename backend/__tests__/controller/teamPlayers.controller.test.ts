@@ -174,9 +174,7 @@ describe('teamPlayers', () => {
     });
     test('it should not delete when not provided valid userId and teamId', async () => {
       const event = { ...baseEvent, queryStringParameters: {}, body: JSON.stringify('') };
-      mockDeleteTeamPlayerRecord.mockImplementationOnce(() => {
-        throw new Error('Test Error');
-      });
+
       const actual = await deleteTeamPlayer(event);
       const expected = setResponse(400, { error: 'userId and teamId is required' }, {});
       expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));
@@ -184,7 +182,9 @@ describe('teamPlayers', () => {
     });
     test('it should 500 status when fails to delete', async () => {
       const event = { ...baseEvent, queryStringParameters: testTeams[0], body: JSON.stringify('') };
-
+      mockDeleteTeamPlayerRecord.mockImplementationOnce(() => {
+        throw new Error('Test Error');
+      });
       const actual = await deleteTeamPlayer(event);
       const expected = setResponse(500, { error: 'Test Error' }, testTeams[0]);
       expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));

@@ -1,6 +1,8 @@
 import { sendStatusEmail } from '../../src/service/sendStatus.service';
 import { setResponse } from '../../src/helper';
 import { sendStatusRequest, resendStatusRequest } from '../../src/controller/sendStatus';
+import { createStatusRecord, updatePlayerStatusRecord } from '../../src/service/statusDB.service';
+
 import { APIGatewayProxyEvent } from 'aws-lambda';
 jest.mock('../../src/service/statusDB.service', () => {
   return {
@@ -17,6 +19,8 @@ jest.mock('../../src/service/sendStatus.service', () => {
 });
 
 const mockSendStatusEmail = sendStatusEmail as jest.Mock<any>;
+const mockCreateStatusRecord = createStatusRecord as jest.Mock<any>;
+const mockUpdatePlayerStatusRecord = updatePlayerStatusRecord as jest.Mock<any>;
 
 jest.mock('aws-sdk', () => {
   const mockedSES = {
@@ -54,6 +58,33 @@ describe('sendStatus', () => {
     teamName: 'teamNameTest',
   };
 
+  const testAddPlayerValidPlayers = [
+    {
+      id: 'testAddPlayerId1',
+      phoneNumber: '1234567894',
+      sendEmail: true,
+      sendText: true,
+      email: 'testEmail@testEmail.com',
+    },
+    {
+      id: 'testAddPlayerId2',
+      phoneNumber: '1234567894',
+      sendEmail: false,
+      sendText: false,
+      email: 'testEmail@testEmail.com',
+    },
+  ];
+
+  const validAddPlayerTestTeam = {
+    teamId: 'statusAddPlayerTeam1',
+    gameId: 'statusAddPlayerGameId',
+    dateTime: 'dateTimeTest',
+    players: testAddPlayerValidPlayers,
+    opponentName: 'opponentAddPlayerNameTest',
+    teamName: 'teamNameAddPlayerTest',
+    addPlayer: true,
+  };
+
   const baseEvent: APIGatewayProxyEvent = {
     body: '',
     headers: {},
@@ -85,6 +116,36 @@ describe('sendStatus', () => {
       const actual = await sendStatusRequest(event);
       const expected = setResponse(201, {}, validTestTeam);
       expect(actual.statusCode).toEqual(expected.statusCode);
+    });
+    test('it returns status 201 when given valid inputs for adding player and call updatePlayerStatusRecord', async () => {
+      const event = {
+        ...baseEvent,
+        queryStringParameters: undefined,
+        body: JSON.stringify(validAddPlayerTestTeam),
+      };
+      mockSendStatusEmail.mockImplementationOnce(() => {
+        return { sesReturn: '', sentEmails: testValidPlayers };
+      });
+      const actual = await sendStatusRequest(event);
+      const expected = setResponse(201, {}, validTestTeam);
+      expect(actual.statusCode).toEqual(expected.statusCode);
+      expect(mockCreateStatusRecord.mock.calls).toHaveLength(0);
+      expect(mockUpdatePlayerStatusRecord.mock.calls).toHaveLength(2);
+      expect(mockUpdatePlayerStatusRecord.mock.calls[0][0]).toEqual({
+        gameId: 'statusAddPlayerGameId',
+        playerId: 'testAddPlayerId1',
+        teamId: 'statusAddPlayerTeam1',
+        updateField: 'players',
+        updateValue: {
+          email: 'testEmail@testEmail.com',
+          id: 'testAddPlayerId1',
+          phoneNumber: '1234567894',
+          sendEmail: true,
+          sendText: true,
+          smsDelivered: null,
+          status: null,
+        },
+      });
     });
     test('it returns status 400 when given inValid inputs', async () => {
       const event = { ...baseEvent, queryStringParameters: undefined, body: JSON.stringify({}) };

@@ -22,7 +22,7 @@ export interface TeamPlayerQueryOutput extends ResponseError {
 
 export interface StatusUpdateInput {
   updateField: string;
-  updateValue: string;
+  updateValue: string | Player;
   playerId: string;
   teamId: string;
   gameId: string;
@@ -112,4 +112,5 @@ export interface StatusUpdateBody extends SearchStatuses {
   dateTime?: string;
   teamName?: string;
   opponentName?: string;
+  addPlayer?: boolean;
 }

@@ -92,18 +92,21 @@ export const updatePlayerStatusRecord = (updateParams: StatusUpdateInput): Promi
     teamId: teamId,
     gameId: gameId,
   };
-  const attributeToUpdate = updateField;
   const attributeValueToUpdate = updateValue;
+  let updateExpression = 'SET #pl.#plToUpdate = :stUpdate';
   const expressionAttNames = {
     '#pl': 'players',
     '#plToUpdate': playerId,
-    '#st': attributeToUpdate,
   };
+  if (updateField !== 'players') {
+    expressionAttNames['#st'] = updateField;
+    updateExpression = 'SET #pl.#plToUpdate.#st = :stUpdate';
+  }
 
   const params = {
     TableName: process.env.tableGameAttendants,
     Key: key,
-    UpdateExpression: 'SET #pl.#plToUpdate.#st = :stUpdate',
+    UpdateExpression: updateExpression,
     ExpressionAttributeNames: expressionAttNames,
     ExpressionAttributeValues: { ':stUpdate': attributeValueToUpdate },
     ReturnValues: 'ALL_NEW',

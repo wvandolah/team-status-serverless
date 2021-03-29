@@ -73,6 +73,11 @@ provider:
       Action:
         - SNS:Publish
       Resource: { "Fn::Join" : [":", ["arn:aws:sns:${opt:region, self:provider.region}", { "Ref" : "AWS::AccountId" }, "${self:custom.topic.sendNotificationTopic}" ] ]  }
+    - Effect: Allow
+      Action:
+        - SES:SendBulkTemplatedEmail
+      Resource: "*"
+
 
 functions:
   authFn:

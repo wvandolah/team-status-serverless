@@ -12,20 +12,36 @@ import {
   sendStatusTypes,
 } from '../../../common/models';
 
-export const sendStatusRequest = async (event: APIEvent<SearchStatus>): Promise<APIGatewayProxyResult> => {
-  const { data } = parseEvent<StatusUpdateBody, SearchStatus>(event);
+export const sendStatusRequest = async (event: APIEvent<StatusUpdateBody>): Promise<APIGatewayProxyResult> => {
+  const { data } = parseEvent<StatusUpdateBody, unknown>(event);
   let statusCode = 201;
   let response: Status | ResponseError;
+  console.info('[sendStatus]: received event: ', data);
   try {
     if (data.players && data.players.length > 0 && 'teamId' in data && 'dateTime' in data) {
-      const gameId = shortid.generate();
-
+      const gameId = data.addPlayer ? data.gameId : shortid.generate();
       await sendNotifications({ ...data, gameId: gameId }, sendStatusTypes.NEW_GAME);
-
       const { sesReturn } = sendStatusEmail(data.players, data);
       await sesReturn;
       const result = buildResults({ ...data, gameId: gameId });
-      await createStatusRecord(result);
+      if (data.addPlayer) {
+        await Promise.all(
+          data.players.map((player) => {
+            player.smsDelivered = null;
+            player.status = null;
+            return updatePlayerStatusRecord({
+              teamId: data.teamId,
+              gameId: gameId,
+              playerId: player.id,
+              updateField: 'players',
+              updateValue: player,
+            });
+          }),
+        );
+      } else {
+        await createStatusRecord(result);
+      }
+
       response = { ...result };
     } else {
       statusCode = 400;
@@ -45,6 +61,7 @@ export const resendStatusRequest = async (event: APIEvent<SearchStatus>): Promis
   const { data } = parseEvent<StatusUpdateBody, SearchStatus>(event);
   let statusCode = 201;
   let response = {};
+  console.info('[reSendStatus]: received event: ', data);
   try {
     if (data.players && data.players.length > 0 && 'teamId' in data && 'dateTime' in data) {
       await sendNotifications(data, sendStatusTypes.NEW_GAME);

@@ -2,7 +2,6 @@ import { searchStatus, searchStatuses, deleteStatus, updatePlayerStatus } from '
 import { searchStatusRecord, deleteStatusRecord, updatePlayerStatusRecord } from '../../src/service/statusDB.service';
 import { sendDeleteEmail } from '../../src/service/sendStatus.service';
 import { setResponse } from '../../src/helper';
-import { APIGatewayProxyEvent } from 'aws-lambda';
 import { APIEvent, PlayerTypes, SearchStatus, SearchStatuses } from '../../../common/models';
 jest.mock('../../src/service/statusDB.service', () => {
   return {
@@ -105,7 +104,6 @@ describe('status', () => {
         status: 'in',
         type: 'full',
       };
-      console.log(mockReturn.Items[0].players);
       expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));
       expect(JSON.parse(actual.body).response.Items[0].players[0]).toEqual(expectedPlayer);
 
