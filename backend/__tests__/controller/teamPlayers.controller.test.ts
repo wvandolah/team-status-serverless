@@ -1,10 +1,11 @@
-const { create, search, deleteTeamPlayer } = require('../../src/controller/teamPlayers');
-const { setResponse } = require('../../src/helper');
-const {
+import { APIGatewayProxyEvent } from 'aws-lambda';
+import { create, search, deleteTeamPlayer } from '../../src/controller/teamPlayers';
+import { setResponse } from '../../src/helper';
+import {
   createTeamPlayerRecord,
   searchTeamPlayerRecord,
   deleteTeamPlayerRecord,
-} = require('../../src/service/teamPlayers.service');
+} from '../../src/service/teamPlayers.service';
 
 jest.mock('../../src/service/teamPlayers.service', () => {
   return {
@@ -13,6 +14,11 @@ jest.mock('../../src/service/teamPlayers.service', () => {
     deleteTeamPlayerRecord: jest.fn().mockReturnThis(),
   };
 });
+
+const mockSearchTeamPlayerRecord = searchTeamPlayerRecord as jest.Mock<any>;
+const mockCreateTeamPlayerRecord = createTeamPlayerRecord as jest.Mock<any>;
+const mockDeleteTeamPlayerRecord = deleteTeamPlayerRecord as jest.Mock<any>;
+
 describe('teamPlayers', () => {
   const testTeams = [
     {
@@ -37,6 +43,21 @@ describe('teamPlayers', () => {
     },
   ];
 
+  const baseEvent: APIGatewayProxyEvent = {
+    body: '',
+    headers: {},
+    httpMethod: 'GET',
+    isBase64Encoded: false,
+    path: '',
+    pathParameters: {},
+    queryStringParameters: undefined,
+    stageVariables: {},
+    requestContext: undefined,
+    multiValueHeaders: undefined,
+    multiValueQueryStringParameters: undefined,
+    resource: '',
+  };
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -52,6 +73,7 @@ describe('teamPlayers', () => {
         ],
       };
       const event = {
+        ...baseEvent,
         body: JSON.stringify(body),
       };
       const actual = await create(event);
@@ -66,9 +88,7 @@ describe('teamPlayers', () => {
           },
         ],
       };
-      const event = {
-        body: JSON.stringify(body),
-      };
+      const event = { ...baseEvent, body: JSON.stringify(body) };
       const actual = await create(event);
       expect(actual).toEqual(setResponse(400, { error: 'All needed information not provided' }, body));
     });
@@ -83,9 +103,10 @@ describe('teamPlayers', () => {
         ],
       };
       const event = {
+        ...baseEvent,
         body: JSON.stringify(body),
       };
-      createTeamPlayerRecord.mockImplementationOnce(() => {
+      mockCreateTeamPlayerRecord.mockImplementationOnce(() => {
         throw new Error('Test Error');
       });
       const actual = await create(event);
@@ -95,8 +116,8 @@ describe('teamPlayers', () => {
 
   describe('when searching teamPlayer', () => {
     test('it finds correct when given valid teamId and userId', async () => {
-      const event = { queryStringParameters: testTeams[0], body: JSON.stringify('') };
-      searchTeamPlayerRecord.mockImplementationOnce(() => {
+      const event = { ...baseEvent, queryStringParameters: testTeams[0], body: JSON.stringify('') };
+      mockSearchTeamPlayerRecord.mockImplementationOnce(() => {
         return testTeams[0];
       });
       const actual = await search(event);
@@ -106,8 +127,8 @@ describe('teamPlayers', () => {
     });
     test('it finds all teams when given valid userId', async () => {
       const searchTerms = { userId: testTeams[0].userId };
-      const event = { queryStringParameters: searchTerms, body: JSON.stringify('') };
-      searchTeamPlayerRecord.mockImplementationOnce(() => {
+      const event = { ...baseEvent, queryStringParameters: searchTerms, body: JSON.stringify('') };
+      mockSearchTeamPlayerRecord.mockImplementationOnce(() => {
         return [testTeams[0], testTeams[3]];
       });
       const actual = await search(event);
@@ -118,7 +139,7 @@ describe('teamPlayers', () => {
     });
     test('it returns 400 status when no userId', async () => {
       const searchTerms = { userIds: 'invalidKey' };
-      const event = { queryStringParameters: searchTerms, body: JSON.stringify('') };
+      const event = { ...baseEvent, queryStringParameters: searchTerms, body: JSON.stringify('') };
       const actual = await search(event);
 
       const expected = setResponse(400, { error: 'UserId is required' }, searchTerms);
@@ -128,8 +149,8 @@ describe('teamPlayers', () => {
 
     test('it returns 500 status when save fails', async () => {
       const searchTerms = { userId: testTeams[0].userId };
-      const event = { queryStringParameters: searchTerms, body: JSON.stringify('') };
-      searchTeamPlayerRecord.mockImplementationOnce(() => {
+      const event = { ...baseEvent, queryStringParameters: searchTerms, body: JSON.stringify('') };
+      mockSearchTeamPlayerRecord.mockImplementationOnce(() => {
         throw new Error('Test Error');
       });
       const actual = await search(event);
@@ -142,8 +163,8 @@ describe('teamPlayers', () => {
 
   describe('when deleting teamPlayer', () => {
     test('it should delete when provided valid userId and teamId', async () => {
-      const event = { queryStringParameters: testTeams[0], body: JSON.stringify('') };
-      deleteTeamPlayerRecord.mockImplementationOnce(() => {
+      const event = { ...baseEvent, queryStringParameters: testTeams[0], body: JSON.stringify('') };
+      mockDeleteTeamPlayerRecord.mockImplementationOnce(() => {
         return testTeams[0];
       });
       const actual = await deleteTeamPlayer(event);
@@ -152,18 +173,18 @@ describe('teamPlayers', () => {
       expect(actual.statusCode).toBe(expected.statusCode);
     });
     test('it should not delete when not provided valid userId and teamId', async () => {
-      const event = { queryStringParameters: {}, body: JSON.stringify('') };
-      deleteTeamPlayerRecord.mockImplementationOnce(() => {
-        throw new Error('Test Error');
-      });
+      const event = { ...baseEvent, queryStringParameters: {}, body: JSON.stringify('') };
+
       const actual = await deleteTeamPlayer(event);
       const expected = setResponse(400, { error: 'userId and teamId is required' }, {});
       expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));
       expect(actual.statusCode).toBe(expected.statusCode);
     });
     test('it should 500 status when fails to delete', async () => {
-      const event = { queryStringParameters: testTeams[0], body: JSON.stringify('') };
-
+      const event = { ...baseEvent, queryStringParameters: testTeams[0], body: JSON.stringify('') };
+      mockDeleteTeamPlayerRecord.mockImplementationOnce(() => {
+        throw new Error('Test Error');
+      });
       const actual = await deleteTeamPlayer(event);
       const expected = setResponse(500, { error: 'Test Error' }, testTeams[0]);
       expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));

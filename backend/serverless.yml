@@ -4,20 +4,27 @@ plugins:
   - serverless-dynamodb-local
   - serverless-offline
   - serverless-domain-manager
+  - serverless-webpack
 
 custom:
   stage: ${opt:stage, self:provider.stage}
   domains:
-    prod: teamstatus-api.wvandolah.com
-    dev: teamstatus-api-dev.wvandolah.com
+    root: wvandolah.com
+    api: 
+      prod: teamstatus-api.${self:custom.domains.root}
+      dev: teamstatus-api-${self:custom.stage}.${self:custom.domains.root}
+    ui:
+      prod: teamstatus.${self:custom.domains.root}
+      dev: teamstatus-${self:custom.stage}.${self:custom.domains.root}
+      local: localhost:3000
   customDomain:
-    domainName: ${self:custom.domains.${self:custom.stage}}
+    domainName: ${self:custom.domains.api.${self:custom.stage}}
     basePath: ''
     stage: ${self:custom.stage}
     createRoute53Record: true
     certificateName: 'wvandolah.com'
   serverless-offline:
-    port: 4000
+    httpPort: 4000
   tables:
     gameAttendants: "game-attendants-${self:custom.stage}"
     teamPlayers: "team-player-${self:custom.stage}"
@@ -27,16 +34,22 @@ custom:
     audience: gameattendants
   dynamodb:
     stages:
-      - ${self:provider.stage}
+      - ${self:custom.stage}
     start:
       inMemory: true
       migrate: true
       stage: ${opt:stage, 'dev'}
   topic: 
     sendNotificationTopic: "gameattendanttasks-${self:custom.stage}-send-notification-topic"
+  webpack:
+    webpackConfig: 'webpack.config.js'   # Name of webpack configuration file
+    includeModules: true   # Node modules configuration for packaging
+    packager: 'npm'   # Packager that will be used to package your external modules
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs12.x
+  environment:
+    domainName: ${self:custom.domains.ui.${self:custom.stage}}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -60,6 +73,11 @@ provider:
       Action:
         - SNS:Publish
       Resource: { "Fn::Join" : [":", ["arn:aws:sns:${opt:region, self:provider.region}", { "Ref" : "AWS::AccountId" }, "${self:custom.topic.sendNotificationTopic}" ] ]  }
+    - Effect: Allow
+      Action:
+        - SES:SendBulkTemplatedEmail
+      Resource: "*"
+
 
 functions:
   authFn:

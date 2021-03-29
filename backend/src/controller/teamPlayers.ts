@@ -1,10 +1,7 @@
-'use strict';
-const { setResponse, parseEvent } = require('../helper');
-const {
-  createTeamPlayerRecord,
-  searchTeamPlayerRecord,
-  deleteTeamPlayerRecord,
-} = require('../service/teamPlayers.service');
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import type { ResponseError, TeamPlayer, TeamPlayerQueryOutput, TeamPlayerUpdateOutput } from '../../../common/models';
+import { setResponse, parseEvent } from '../helper';
+import { createTeamPlayerRecord, searchTeamPlayerRecord, deleteTeamPlayerRecord } from '../service/teamPlayers.service';
 
 /**
  * Expected struct.  
@@ -20,13 +17,13 @@ const {
     }
   * 
  */
-module.exports.create = async (event) => {
-  const { data } = parseEvent(event);
-  let response = {};
+export const create = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  const { data } = parseEvent<TeamPlayer, unknown>(event);
+  let response: TeamPlayer | ResponseError;
   let statusCode = 201;
   try {
     if ('userId' in data && 'teamId' in data && 'players' in data && data.players.length > 0) {
-      const record = {
+      const record: TeamPlayer = {
         userId: data.userId,
         teamId: data.teamId,
         players: data.players,
@@ -50,9 +47,9 @@ module.exports.create = async (event) => {
   return setResponse(statusCode, response, data);
 };
 
-module.exports.search = async (event) => {
-  let { queryParams } = parseEvent(event);
-  let response = {};
+export const search = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  const { queryParams } = parseEvent(event);
+  let response: TeamPlayerQueryOutput;
   let statusCode = 200;
   try {
     if (queryParams && 'userId' in queryParams) {
@@ -73,9 +70,9 @@ module.exports.search = async (event) => {
   return setResponse(statusCode, response, queryParams);
 };
 
-module.exports.deleteTeamPlayer = async (event) => {
-  let { queryParams } = parseEvent(event);
-  let response = {};
+export const deleteTeamPlayer = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  const { queryParams } = parseEvent(event);
+  let response: TeamPlayerUpdateOutput;
   let statusCode = 200;
   try {
     if ('userId' in queryParams && 'teamId' in queryParams) {

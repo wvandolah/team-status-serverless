@@ -1,8 +1,8 @@
-const {
+import {
   createTeamPlayerRecord,
   searchTeamPlayerRecord,
   deleteTeamPlayerRecord,
-} = require('../../src/service/teamPlayers.service');
+} from '../../src/service/teamPlayers.service';
 const testTeams = [
   {
     teamId: 'statusTeam1',
@@ -67,7 +67,7 @@ describe('teamPlayer.service', () => {
     });
     test('it does not save when not given teamId', async () => {
       try {
-        await searchTeamPlayerRecord({ fakeKey: 'userId2' });
+        await searchTeamPlayerRecord({ teamName: 'userId2' });
         expect(true).toBe(false);
       } catch (e) {
         expect(e.message).toBe('User information not provided');

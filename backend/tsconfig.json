@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "types": ["jest"],
+  "include": ["src/**/*", "__tests__/**/*"],
+  "exclude": [
+    "node_modules/**/*",
+    ".serverless/**/*",
+    ".webpack/**/*",
+    "_warmup/**/*",
+    ".vscode/**/*"
+  ]
+}

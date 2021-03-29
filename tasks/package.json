@@ -8,7 +8,7 @@
   "scripts": {
     "local": "serverless offline start --noAuth",
     "test": "jest --watch",
-    "testCoverage": "jest --coverage"
+    "testCoverage": "jest --clearCache && jest --coverage"
   },
   "devDependencies": {
     "@shelf/jest-dynamodb": "^1.7.0",

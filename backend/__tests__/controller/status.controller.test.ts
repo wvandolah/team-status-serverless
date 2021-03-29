@@ -1,12 +1,8 @@
-const { searchStatus, searchStatuses, deleteStatus, updatePlayerStatus } = require('../../src/controller/status');
-const {
-  searchStatusRecord,
-  deleteStatusRecord,
-  updatePlayerStatusRecord,
-} = require('../../src/service/statusDB.service');
-const { sendDeleteSMS, sendDeleteEmail, sendNotifications } = require('../../src/service/sendStatus.service');
-const { setResponse } = require('../../src/helper');
-
+import { searchStatus, searchStatuses, deleteStatus, updatePlayerStatus } from '../../src/controller/status';
+import { searchStatusRecord, deleteStatusRecord, updatePlayerStatusRecord } from '../../src/service/statusDB.service';
+import { sendDeleteEmail } from '../../src/service/sendStatus.service';
+import { setResponse } from '../../src/helper';
+import { APIEvent, PlayerTypes, SearchStatus, SearchStatuses } from '../../../common/models';
 jest.mock('../../src/service/statusDB.service', () => {
   return {
     searchStatusRecord: jest.fn().mockReturnThis(),
@@ -23,12 +19,17 @@ jest.mock('../../src/service/sendStatus.service', () => {
   };
 });
 
+const mockSearchStatusRecord = searchStatusRecord as jest.Mock<any>;
+const mockDeleteStatusRecord = deleteStatusRecord as jest.Mock<any>;
+const mockUpdatePlayerStatusRecord = updatePlayerStatusRecord as jest.Mock<any>;
+const mockSendDeleteEmail = sendDeleteEmail as jest.Mock<any>;
 describe('status', () => {
   const testTeams = [
     {
       teamId: 'statusTeam1',
       gameId: 'gameId1',
       playerId: 'playerId1',
+      historic: 'true',
       status: 'in',
     },
     {
@@ -40,6 +41,7 @@ describe('status', () => {
       teamId: 'statusTeam1',
       gameId: 'gameId3',
       playerId: 'playerId3',
+      status: 'OUT',
     },
     {
       teamId: 'statusTeam2',
@@ -58,39 +60,80 @@ describe('status', () => {
   });
 
   describe('when searching single status record', () => {
-    test('it should return status 200 and record if found', async () => {
-      const event = { queryStringParameters: testTeams[0], body: JSON.stringify('') };
+    test('it should return status 200 and record if found and mask PII', async () => {
+      const event: APIEvent<SearchStatus> = {
+        queryStringParameters: testTeams[0] as SearchStatus,
+        body: JSON.stringify(''),
+      };
       const mockReturn = {
         Count: 1,
-        Items: [{ ...testTeams[0], players: { [testTeams[0].playerId]: testTeams[0].playerId } }],
+        Items: [
+          {
+            ...testTeams[0],
+            players: {
+              [testTeams[0].playerId]: {
+                id: testTeams[0].playerId,
+                lastName: 'van',
+                firstName: 'will',
+                status: 'in',
+                phoneNumber: '817',
+                email: 'test@test',
+                sendEmail: true,
+                sendText: true,
+                smsDelivered: true,
+                type: PlayerTypes.FULL,
+              },
+            },
+          },
+        ],
       };
-      searchStatusRecord.mockImplementationOnce(() => {
+      mockSearchStatusRecord.mockImplementationOnce(() => {
         return mockReturn;
       });
       const actual = await searchStatus(event);
-      const expected = setResponse(200, { ...mockReturn }, testTeams[0]);
+      const expected = setResponse(200, JSON.parse(JSON.stringify(mockReturn)), testTeams[0]);
+      const expectedPlayer = {
+        email: null,
+        firstName: 'will',
+        id: 'playerId1',
+        lastName: 'v',
+        phoneNumber: null,
+        sendEmail: null,
+        sendText: null,
+        smsDelivered: null,
+        status: 'in',
+        type: 'full',
+      };
       expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));
+      expect(JSON.parse(actual.body).response.Items[0].players[0]).toEqual(expectedPlayer);
+
       expect(actual.statusCode).toBe(expected.statusCode);
     });
     test('it should return status 200 and empty body if no record', async () => {
-      const event = { queryStringParameters: testTeams[0], body: JSON.stringify('') };
+      const event: APIEvent<SearchStatus> = {
+        queryStringParameters: testTeams[0] as SearchStatus,
+        body: JSON.stringify(''),
+      };
       const mockReturn = {
         Count: 0,
       };
-      searchStatusRecord.mockImplementationOnce(() => {
+      mockSearchStatusRecord.mockImplementationOnce(() => {
         return mockReturn;
       });
       const actual = await searchStatus(event);
-      const expected = setResponse(200, {}, testTeams[0]);
+      const expected = setResponse(200, { Count: 0 }, testTeams[0]);
       expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));
       expect(actual.statusCode).toBe(expected.statusCode);
     });
     test('it should return status 500 if search fails', async () => {
-      const event = { queryStringParameters: testTeams[0], body: JSON.stringify('') };
+      const event: APIEvent<SearchStatus> = {
+        queryStringParameters: testTeams[0] as SearchStatus,
+        body: JSON.stringify(''),
+      };
       const mockReturn = {
         Count: 1,
       };
-      searchStatusRecord.mockImplementationOnce(() => {
+      mockSearchStatusRecord.mockImplementationOnce(() => {
         return mockReturn;
       });
       const actual = await searchStatus(event);
@@ -102,12 +145,15 @@ describe('status', () => {
 
   describe('when searching team status records', () => {
     test('it should return status 200 and records if found', async () => {
-      const event = { queryStringParameters: testTeams[0], body: JSON.stringify('') };
+      const event: APIEvent<SearchStatuses> = {
+        queryStringParameters: testTeams[0] as SearchStatuses,
+        body: JSON.stringify(''),
+      };
       const mockReturn = {
         Count: 1,
         Items: [{ ...testTeams[0], players: { [testTeams[0].playerId]: testTeams[0].playerId } }],
       };
-      searchStatusRecord.mockImplementationOnce(() => {
+      mockSearchStatusRecord.mockImplementationOnce(() => {
         return mockReturn;
       });
       const actual = await searchStatuses(event);
@@ -116,12 +162,15 @@ describe('status', () => {
       expect(actual.statusCode).toBe(expected.statusCode);
     });
     test('it should return status 200 if no found', async () => {
-      const event = { queryStringParameters: testTeams[0], body: JSON.stringify('') };
+      const event: APIEvent<SearchStatuses> = {
+        queryStringParameters: testTeams[0] as SearchStatuses,
+        body: JSON.stringify(''),
+      };
       const mockReturn = {
         Count: 0,
         Items: [{ ...testTeams[0], players: { [testTeams[0].playerId]: testTeams[0].playerId } }],
       };
-      searchStatusRecord.mockImplementationOnce(() => {
+      mockSearchStatusRecord.mockImplementationOnce(() => {
         return mockReturn;
       });
       const actual = await searchStatuses(event);
@@ -130,8 +179,11 @@ describe('status', () => {
       expect(actual.statusCode).toBe(expected.statusCode);
     });
     test('it should return status 500 unable to search', async () => {
-      const event = { queryStringParameters: testTeams[0], body: JSON.stringify('') };
-      searchStatusRecord.mockImplementationOnce(() => {
+      const event: APIEvent<SearchStatuses> = {
+        queryStringParameters: testTeams[0] as SearchStatuses,
+        body: JSON.stringify(''),
+      };
+      mockSearchStatusRecord.mockImplementationOnce(() => {
         throw new Error('testError');
       });
       const actual = await searchStatuses(event);
@@ -144,7 +196,7 @@ describe('status', () => {
   describe('when deleting statusGame', () => {
     test('it should return 200 when given valid team and game id and send notifications if game in future', async () => {
       const event = { queryStringParameters: testTeams[0], body: JSON.stringify(testTeams[0]) };
-      deleteStatusRecord.mockImplementationOnce(() => {
+      mockDeleteStatusRecord.mockImplementationOnce(() => {
         const testDate = new Date('2030-07-19T06:14:35.749Z');
         return {
           Attributes: {
@@ -162,12 +214,12 @@ describe('status', () => {
       });
       const actual = await deleteStatus(event);
       const expected = setResponse(200, {}, testTeams[0]);
-      expect(sendDeleteEmail.mock.calls).toHaveLength(1);
+      expect(mockSendDeleteEmail.mock.calls).toHaveLength(1);
       expect(actual.statusCode).toBe(expected.statusCode);
     });
     test('it should return 200 when given valid team and game id and not send notifications if game in future and not send flags enabled', async () => {
       const event = { queryStringParameters: testTeams[0], body: JSON.stringify(testTeams[0]) };
-      deleteStatusRecord.mockImplementationOnce(() => {
+      mockDeleteStatusRecord.mockImplementationOnce(() => {
         const testDate = new Date('2030-07-19T06:14:35.749Z');
         return {
           Attributes: {
@@ -189,7 +241,7 @@ describe('status', () => {
     });
     test('it should return 200 when given valid team and game id and not send notifications if game in past', async () => {
       const event = { queryStringParameters: testTeams[0], body: JSON.stringify(testTeams[0]) };
-      deleteStatusRecord.mockImplementationOnce(() => {
+      mockDeleteStatusRecord.mockImplementationOnce(() => {
         const testDate = new Date('2010-07-19T06:14:35.749Z');
         return {
           Attributes: {
@@ -207,32 +259,32 @@ describe('status', () => {
       });
       const actual = await deleteStatus(event);
       const expected = setResponse(200, {}, testTeams[0]);
-      expect(sendDeleteEmail.mock.calls).toHaveLength(0);
+      expect(mockSendDeleteEmail.mock.calls).toHaveLength(0);
       expect(actual.statusCode).toBe(expected.statusCode);
     });
     test('it should return 400 when given invalid team and game id', async () => {
       const event = { queryStringParameters: testTeams[0], body: JSON.stringify({ fake: 'hello' }) };
       const actual = await deleteStatus(event);
       const expected = setResponse(400, {}, testTeams[0]);
-      expect(sendDeleteEmail.mock.calls).toHaveLength(0);
+      expect(mockSendDeleteEmail.mock.calls).toHaveLength(0);
       expect(actual.statusCode).toBe(expected.statusCode);
     });
     test('it should return 500 when unable to delete', async () => {
       const event = { queryStringParameters: testTeams[0], body: JSON.stringify(testTeams[0]) };
-      deleteStatusRecord.mockImplementationOnce(() => {
+      mockDeleteStatusRecord.mockImplementationOnce(() => {
         throw new Error('TestError');
       });
       const actual = await deleteStatus(event);
       const expected = setResponse(500, {}, testTeams[0]);
-      expect(sendDeleteEmail.mock.calls).toHaveLength(0);
+      expect(mockSendDeleteEmail.mock.calls).toHaveLength(0);
       expect(actual.statusCode).toBe(expected.statusCode);
     });
   });
 
   describe('when updating player status', () => {
     test('it should return 201 when teamId, gameId, playerId, and status is provided', async () => {
-      const event = { body: JSON.stringify(testTeams[0]) };
-      updatePlayerStatusRecord.mockImplementationOnce(() => {
+      const event = { body: JSON.stringify(testTeams[0]), queryStringParameters: '' };
+      mockUpdatePlayerStatusRecord.mockImplementationOnce(() => {
         return testTeams[0];
       });
       const actual = await updatePlayerStatus(event);
@@ -241,8 +293,8 @@ describe('status', () => {
       expect(JSON.parse(actual.body)).toEqual(JSON.parse(expected.body));
     });
     test('it should return 400 when teamId, gameId, playerId, and status is not provided', async () => {
-      const event = { body: JSON.stringify(testTeams[1]) };
-      updatePlayerStatusRecord.mockImplementationOnce(() => {
+      const event = { body: JSON.stringify(testTeams[1]), queryStringParameters: '' };
+      mockUpdatePlayerStatusRecord.mockImplementationOnce(() => {
         return testTeams[1];
       });
       const actual = await updatePlayerStatus(event);
@@ -256,8 +308,8 @@ describe('status', () => {
     });
     test('it should return 500 when unable to update', async () => {
       jest.resetAllMocks();
-      const event = { body: JSON.stringify(testTeams[0]) };
-      updatePlayerStatusRecord.mockImplementationOnce(() => {
+      const event = { body: JSON.stringify(testTeams[0]), queryStringParameters: '' };
+      mockUpdatePlayerStatusRecord.mockImplementationOnce(() => {
         throw new Error('TestError');
       });
       const actual = await updatePlayerStatus(event);

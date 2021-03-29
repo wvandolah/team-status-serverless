@@ -13,10 +13,16 @@
     "backendStart": "cd backend && npm run local"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.14.1",
+    "@typescript-eslint/parser": "^4.14.1",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-jest": "^23.18.0",
     "eslint-plugin-prettier": "^3.1.2",
-    "prettier": "^2.0.4"
+    "prettier": "^2.0.4",
+    "serverless-webpack": "^5.2.0",
+    "webpack": "^5.4.0",
+    "webpack-node-externals": "^2.5.2",
+    "typescript": "^4.0.5"
   }
 }

@@ -1,7 +1,14 @@
-const { authFn } = require('../../src/service/authFn');
-const createJWKSMock = require('mock-jwks').default;
+import { authFn } from '../../src/service/authFn';
+import { default as createJWKSMock } from 'mock-jwks';
+import { APIGatewayTokenAuthorizerEvent } from 'aws-lambda';
 
 describe('authFn.service', () => {
+  const baseEvent: APIGatewayTokenAuthorizerEvent = {
+    type: 'TOKEN',
+    methodArn: '',
+    authorizationToken: '',
+  };
+
   describe('when accessing protected route', () => {
     const jwks = createJWKSMock('https://test');
     const successfulReturn = {
@@ -31,7 +38,7 @@ describe('authFn.service', () => {
         iss: process.env.issuer,
       });
 
-      const actual = await authFn({ authorizationToken: token });
+      const actual = await authFn({ ...baseEvent, authorizationToken: token });
 
       expect(actual).toEqual(successfulReturn);
     });
@@ -39,7 +46,7 @@ describe('authFn.service', () => {
     test('it should fail if incorrect audience', async () => {
       const token = jwks.token({});
       try {
-        await authFn({ authorizationToken: token });
+        await authFn({ ...baseEvent, authorizationToken: token });
         expect(true).toBe(false);
       } catch (e) {
         expect(e).toEqual(new Error('Unauthorized'));
@@ -52,7 +59,7 @@ describe('authFn.service', () => {
         exp: 0,
       });
       try {
-        await authFn({ authorizationToken: token });
+        await authFn({ ...baseEvent, authorizationToken: token });
         expect(true).toBe(false);
       } catch (e) {
         expect(e).toEqual(new Error('Unauthorized'));

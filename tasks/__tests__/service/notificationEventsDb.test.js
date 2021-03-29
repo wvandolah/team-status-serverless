@@ -39,7 +39,7 @@ describe('notificationEventsDB', () => {
       ],
     };
     const alsoValidInput = {
-      teamInfo: { teamName: 'testing2s', dateTime: '7/30/2020, 3:44:31 PM', teamId: 'VyXY1ikPw', gameId: 'gameId' },
+      teamInfo: { teamName: 'testing2s', dateTime: '2021-03-09T06:27:10.502Z', teamId: 'VyXY1ikPw', gameId: 'gameId' },
       players: [
         {
           phoneNumber: '8179391234',
@@ -53,7 +53,12 @@ describe('notificationEventsDB', () => {
     };
     const expected = [
       {
-        teamInfo: { teamName: 'testing2s', dateTime: '7/30/2020, 3:44:31 PM', teamId: 'VyXY1ikPw', gameId: 'gameId' },
+        teamInfo: {
+          teamName: 'testing2s',
+          dateTime: '2021-03-09T06:27:10.502Z',
+          teamId: 'VyXY1ikPw',
+          gameId: 'gameId',
+        },
         player: {
           phoneNumber: '8179391234',
           id: 'ZV0xu8M1p',

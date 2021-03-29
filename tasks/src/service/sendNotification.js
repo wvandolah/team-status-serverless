@@ -5,16 +5,19 @@ const { sendStatusTypes } = require('../helper');
 
 const getMessage = (statusType, teamInfo, player) => {
   let message = '';
+  const dateTime = new Date(teamInfo.dateTime).toLocaleString('en-US', {
+    timeZone: 'America/Chicago',
+  });
   const baseUrl =
     process.env.env !== 'prod'
       ? process.env.baseUrl.replace('<stage>', `-${process.env.env}`)
       : process.env.baseUrl.replace('<stage>', '');
   switch (statusType) {
     case sendStatusTypes.NEW_GAME:
-      message = `Confirm your status for ${teamInfo.teamName} game at ${teamInfo.dateTime}: ${baseUrl}/statusUpdate?t=${teamInfo.teamId}&g=${teamInfo.gameId}&p=${player.id}`;
+      message = `Confirm your status for ${teamInfo.teamName} game at ${dateTime}: ${baseUrl}/statusUpdate?t=${teamInfo.teamId}&p=${player.id}`;
       break;
     case sendStatusTypes.DELETE_GAME:
-      message = `${teamInfo.teamName} game at ${teamInfo.dateTime} has been canceled or rescheduled.`;
+      message = `${teamInfo.teamName} game at ${dateTime} has been canceled or rescheduled.`;
       break;
   }
   return message;
@@ -26,7 +29,7 @@ module.exports = {
       Message: getMessage(statusType, teamInfo, player),
       PhoneNumber: `+1${player.phoneNumber.replace(/\D/g, '')}`,
     };
-    console.log('[sendNotification.service]: publishing sms data: ', smsData);
+    console.info('[sendNotification.service]: publishing sms data: ', smsData);
     return sns.publish(smsData).promise();
   },
 };
