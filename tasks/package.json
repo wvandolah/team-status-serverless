@@ -18,7 +18,7 @@
     "nock": "^13.0.2",
     "serverless": "^2.20.1",
     "serverless-dynamodb-local": "^0.2.39",
-    "serverless-offline": "^6.8.0"
+    "serverless-offline": "^12.0.4"
   },
   "dependencies": {
     "jsonwebtoken": "^8.5.1",
